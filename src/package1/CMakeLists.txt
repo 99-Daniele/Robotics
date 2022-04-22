@@ -136,7 +136,7 @@ include_directories(
 # add_executable(${PROJECT_NAME}_node src/package1_node.cpp)
 
 
-add_executable(listener src/baglistener.cpp.cpp)
+add_executable(listener src/baglistener.cpp)
 target_link_libraries(listener ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
