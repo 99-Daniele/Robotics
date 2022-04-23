@@ -15,7 +15,6 @@ void wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
         ROS_INFO("Name - %d: %s", i, msg->name[i].c_str());
         ROS_INFO("Position - %d: %f", i, msg->position[i]);
         ROS_INFO("Velocity - %d: %f", i, msg->velocity[i]);
-        ROS_INFO("Effort - %d: %f", i, msg->effort[i]); //commentato dato che non so perché dà segmentation fault
     }
 }
 
