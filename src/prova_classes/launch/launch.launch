@@ -1,0 +1,12 @@
+<launch>
+
+    <node pkg="callbacks_complete" type="pub_complete" name="my_pub_complete" />
+    <node pkg="callbacks_complete" type="sub_complete" name="my_sub_complete" output="screen" />
+    <!--
+    <arg name="bag1" value="my_bag">
+
+    <node pkg="callbacks_complete" type="sensor_msgs/JointState" name="bag1" />
+-->
+
+
+</launch>

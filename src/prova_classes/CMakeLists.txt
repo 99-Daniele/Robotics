@@ -1,0 +1,29 @@
+cmake_minimum_required(VERSION 2.8.3)
+project(callbacks_complete)
+
+## Find catkin and any catkin packages
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs)
+
+## Declare a catkin package
+catkin_package(
+  INCLUDE_DIRS include
+  LIBRARIES subscriber_class
+#  CATKIN_DEPENDS roscpp std_msgs
+#  DEPENDS system_lib
+)
+
+## Build talker and listener
+
+include_directories(include ${catkin_INCLUDE_DIRS})
+
+add_executable(pub_complete src/main_pub.cpp)
+add_dependencies(pub_complete ${catkin_EXPORTED_TARGETS})
+target_link_libraries(pub_complete ${catkin_LIBRARIES})
+
+add_library(subscriber_class src/Subscriber.cpp)
+add_dependencies(subscriber_class ${catkin_EXPORTED_TARGETS})
+target_link_libraries(subscriber_class ${catkin_LIBRARIES})
+
+add_executable(sub_complete src/main_sub.cpp)
+add_dependencies(sub_complete ${catkin_EXPORTED_TARGETS})
+target_link_libraries(sub_complete ${catkin_LIBRARIES} subscriber_class)
