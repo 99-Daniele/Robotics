@@ -8,3 +8,5 @@ build/catkin_generated/setup_cached.sh
 build/package1/
 devel/lib/
 devel/share/
+.vscode/c_cpp_properties.json
+.vscode/settings.json
