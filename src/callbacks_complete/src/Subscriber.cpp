@@ -57,16 +57,21 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     float numVy;
     numVx = (msg->position[0] - this->old_ticks[0] + msg->position[ 1] - this->old_ticks[1] + msg->position[2] - this->old_ticks[2] + msg->position[3] - this->old_ticks[3]);
     numVy = (-(msg->position[0] - this->old_ticks[0]) + msg->position[1] - this->old_ticks[1] + msg->position[2] - this->old_ticks[2] - (msg->position[3] - this->old_ticks[3]));
-    ROS_INFO("numVx: %f, numVy %f", numVx, numVy);
-
-    //vx=numVx*2*pi/((time-past_time)*N(=42)*T(=5))
-    vx = numVx*2*M_PI  / (msg->Time - msg -> old_time); //msg->Time ?? msg è di tipo sensor_msgs::JointState che non ha un campo Time
+    //ROS_INFO("Duration seconds: %d, and nanoseconds: %d", msg->header.stamp.sec, msg->header.stamp.nsec);
+    //ROS_INFO("Duration in seconds: %lf", msg->header.stamp.toSec());
+        //vx=numVx*2*pi/((time-past_time)*N(=42)*T(=5))
+    vx = numVx*2*M_PI  / (msg->header.stamp - this->old_time).toSec(); //msg->Time ?? msg è di tipo sensor_msgs::JointState che non ha un campo Time
+    vy = numVy*2*M_PI  / (msg->header.stamp - this->old_time).toSec(); //msg->Time ?? msg è di tipo sensor_msgs::JointState che non ha un campo Time
 
     for (int i = 0; i < msg->position.size(); i++){
         this->old_ticks[i]=msg->position[i];
     }
+    this->old_time=msg->header.stamp;
 
-    //codice per pubblicare v e w. Per il momento considero vx = vx, vy = 1, vz = 2; wx = 3, wy = 4, wz = 5 per vedere se funziona correttamente
+    ROS_INFO("numVx: %f, vx: %f,   numVy %f, vy: %f", numVx, vx, numVy,vy);
+
+
+    //codice per pubblicare v e w. Per il momento considero vx = vx, vy = vy, vz = 0; wx = 3, wy = 4, wz = 5 per vedere se funziona correttamente
     ros::Publisher velocity_publisher = n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
 
     geometry_msgs::TwistStamped velocity_msg;
@@ -77,14 +82,15 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     velocity_msg.header = header;*/
 
     velocity_msg.twist.linear.x = vx;
-    velocity_msg.twist.linear.y = 1;
-    velocity_msg.twist.linear.z = 2;
+    velocity_msg.twist.linear.y = vy;
+    velocity_msg.twist.linear.z = 0;
     velocity_msg.twist.angular.x = 3;
     velocity_msg.twist.angular.y = 4;
     velocity_msg.twist.angular.z = 5;
 
     velocity_publisher.publish(velocity_msg);
     ros::spinOnce();
+
 }
 
 
