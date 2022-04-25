@@ -5,8 +5,8 @@
 #include "callbacks_complete/Subscriber.h"
 
 #include "ros/ros.h"
-#include "std_msgs/Int32.h"
 #include "geometry_msgs/PoseStamped.h"
+#include "geometry_msgs/TwistStamped.h"
 #include "sensor_msgs/JointState.h"
 
 Subscriber::Subscriber() { // class constructor
@@ -60,14 +60,31 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     ROS_INFO("numVx: %f, numVy %f", numVx, numVy);
 
     //vx=numVx*2*pi/((time-past_time)*N(=42)*T(=5))
-    vx = numVx*2*M_PI / (msg->Time - msg -> old_time);
+    vx = numVx*2*M_PI  / (msg->Time - msg -> old_time); //msg->Time ?? msg è di tipo sensor_msgs::JointState che non ha un campo Time
 
     for (int i = 0; i < msg->position.size(); i++){
         this->old_ticks[i]=msg->position[i];
     }
 
+    //codice per pubblicare v e w. Per il momento considero vx = vx, vy = 1, vz = 2; wx = 3, wy = 4, wz = 5 per vedere se funziona correttamente
+    ros::Publisher velocity_publisher = n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
 
+    geometry_msgs::TwistStamped velocity_msg;
 
+    /* non so se serve mettere anche l'header, ho trovato sta formula ma non credo sia giusta
+    Header header = std_msgs.msg.Header();
+    header.stamp = rospy.Time.now();
+    velocity_msg.header = header;*/
+
+    velocity_msg.twist.linear.x = vx;
+    velocity_msg.twist.linear.y = 1;
+    velocity_msg.twist.linear.z = 2;
+    velocity_msg.twist.angular.x = 3;
+    velocity_msg.twist.angular.y = 4;
+    velocity_msg.twist.angular.z = 5;
+
+    velocity_publisher.publish(velocity_msg);
+    ros::spinOnce();
 }
 
 
