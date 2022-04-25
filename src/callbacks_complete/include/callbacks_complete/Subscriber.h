@@ -9,6 +9,11 @@
 
 class Subscriber {
 public:
+  float r=0.07;
+  float l=0.200;
+  float w=0.169;
+  float T=5;
+  int N=42;
   Subscriber(); 
   void main_loop();
 
