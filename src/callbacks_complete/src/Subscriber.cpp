@@ -11,7 +11,9 @@ Subscriber::Subscriber() { // class constructor
   this->sub_wheel = this->n.subscribe("wheel_states", 1000, &Subscriber::wheelCallback, this);
 
   this->pub = this->n.advertise<std_msgs::Int32>("sum", 1000);
-  this->sum = 0;
+  this->old_ticks;
+  this->old_time=ros::Time::now();
+ // this->sum = 0;
 }
 
 void Subscriber::main_loop() {
@@ -34,12 +36,35 @@ void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 }
 */
 void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
-    for(int i = 0; i < msg->position.size(); i++) {
+    /*PRINTING BAG VALUES
+     *
+     * for(int i = 0; i < msg->position.size(); i++) {
         ROS_INFO("Name - %d: %s", i, msg->name[i].c_str());
         ROS_INFO("Position - %d: %f", i, msg->position[i]);
         ROS_INFO("Velocity - %d: %f", i, msg->velocity[i]);
-        //ROS_INFO("Effort - %d: %f", i, msg->effort[i]); commentato dato che non so perché dà segmentation fault <=perchè il campo è vuoto
+
+
     }
+     */
+    //FROM TICKS TO robot velocity
+    float vx;
+    float vy;
+    float numVx;//sono step intermedi perchè una volta diviso per il tempo potrebbe dare problemi se i tempi sono infinitesimali
+    float numVy;
+    numVx=(msg->position[0] - this->old_ticks[0] + msg->position[1] - this->old_ticks[1] + msg->position[2] - this->old_ticks[2] + msg->position[3] - this->old_ticks[3]);
+    numVy=(-(msg->position[0] - this->old_ticks[0]) + msg->position[1] - this->old_ticks[1] + msg->position[2] - this->old_ticks[2] - (msg->position[3] - this->old_ticks[3]));
+    ROS_INFO("numVx: %f, numVy %f", numVx, numVy);
+
+
+
+
+
+    for (int i = 0; i < msg->position.size(); i++){
+        this->old_ticks[i]=msg->position[i];
+    }
+
+
+
 }
 
 

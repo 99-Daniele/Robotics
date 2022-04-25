@@ -21,8 +21,11 @@ private:
   ros::Subscriber sub_wheel;
   //ros::Subscriber sub_pose;
 
-    ros::Publisher pub;
-  int sum;
+  ros::Publisher pub;
+ // int sum;
+
+ float old_ticks[4]= {0,0,0,0};
+ ros::Time old_time;
 };
 
 #endif
