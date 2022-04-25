@@ -15,7 +15,10 @@ Subscriber::Subscriber() { // class constructor
   this->sub_wheel = this->n.subscribe("wheel_states", 1000, &Subscriber::wheelCallback, this);
 
   this->pub = this->n.advertise<std_msgs::Int32>("sum", 1000);
-  this->old_ticks;
+  this->velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
+
+
+    this->old_ticks;
   this->old_time=ros::Time::now();
  // this->sum = 0;
 }
@@ -72,7 +75,9 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
 
 
     //codice per pubblicare v e w. Per il momento considero vx = vx, vy = vy, vz = 0; wx = 3, wy = 4, wz = 5 per vedere se funziona correttamente
-    ros::Publisher velocity_publisher = n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
+
+    //l'ho commentato perchè faCCIO L'ADVERTISE UNA VOLTA SOLA, altrimenti mi spesso non vedevo il topic
+    // ros::Publisher velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
 
     geometry_msgs::TwistStamped velocity_msg;
 
@@ -80,6 +85,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     Header header = std_msgs.msg.Header();
     header.stamp = rospy.Time.now();
     velocity_msg.header = header;*/
+    velocity_msg.header.stamp=ros::Time::now();
 
     velocity_msg.twist.linear.x = vx;
     velocity_msg.twist.linear.y = vy;
@@ -88,7 +94,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     velocity_msg.twist.angular.y = 4;
     velocity_msg.twist.angular.z = 5;
 
-    velocity_publisher.publish(velocity_msg);
+    this->velocity_publisher.publish(velocity_msg);
     ros::spinOnce();
 
 }

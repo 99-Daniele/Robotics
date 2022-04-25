@@ -1,13 +1,12 @@
 <launch>
 
     <node pkg="callbacks_complete" type="pub_complete" name="my_pub_complete" />
-    <node pkg="callbacks_complete" type="sub_complete" name="my_sub_complete" output="screen" />
-    <!-- SOSTITUITO IL PATH ASSOLUTO CON QUELLO RELATIVO
-    <arg name="path" default="/home/elena/robotics/src/robotics/src/callbacks_complete/bags/bag1" />
-    -->
+    <node pkg="callbacks_complete" type="sub_complete" name="my_sub_complete" />
+    <node pkg="callbacks_complete" type="Odometry" name="my_Odometry" output="screen"/>
+
+
 
     <arg name="path" default=" $(find callbacks_complete)/bags/bag1" />
-
     <node pkg="rosbag" type="play" name="player" output="screen" args="--clock  $(arg path).bag">
     </node>
 

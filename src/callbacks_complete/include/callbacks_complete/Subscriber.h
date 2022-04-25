@@ -22,6 +22,7 @@ private:
   //ros::Subscriber sub_pose;
 
   ros::Publisher pub;
+  ros::Publisher velocity_publisher;
  // int sum;
 
  float old_ticks[4]= {0,0,0,0};
