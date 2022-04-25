@@ -1,3 +1,7 @@
+#define _USE_MATH_DEFINES
+ 
+#include <cmath>
+#include <iostream>
 #include "callbacks_complete/Subscriber.h"
 
 #include "ros/ros.h"
@@ -51,13 +55,12 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     float vy;
     float numVx;//sono step intermedi perchè una volta diviso per il tempo potrebbe dare problemi se i tempi sono infinitesimali
     float numVy;
-    numVx=(msg->position[0] - this->old_ticks[0] + msg->position[1] - this->old_ticks[1] + msg->position[2] - this->old_ticks[2] + msg->position[3] - this->old_ticks[3]);
-    numVy=(-(msg->position[0] - this->old_ticks[0]) + msg->position[1] - this->old_ticks[1] + msg->position[2] - this->old_ticks[2] - (msg->position[3] - this->old_ticks[3]));
+    numVx = (msg->position[0] - this->old_ticks[0] + msg->position[ 1] - this->old_ticks[1] + msg->position[2] - this->old_ticks[2] + msg->position[3] - this->old_ticks[3]);
+    numVy = (-(msg->position[0] - this->old_ticks[0]) + msg->position[1] - this->old_ticks[1] + msg->position[2] - this->old_ticks[2] - (msg->position[3] - this->old_ticks[3]));
     ROS_INFO("numVx: %f, numVy %f", numVx, numVy);
 
-
-
-
+    //vx=numVx*2*pi/((time-past_time)*N(=42)*T(=5))
+    vx = numVx*2*M_PI / (msg->Time - msg -> old_time);
 
     for (int i = 0; i < msg->position.size(); i++){
         this->old_ticks[i]=msg->position[i];
