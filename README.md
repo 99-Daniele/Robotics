@@ -1,28 +1,27 @@
 # robotics
 ROS projects for robotics class
+***!!! launch senza bag!!!***
 Goals
-I.
-Compute odometry using appropriate kinematics
+I.Compute odometry using appropriate kinematics
  - Compute robot linear and angular velocities v, ⍵ from wheel encoders with mecanum wheels kinematics
   1. Write down the formula to compute v, ⍵ from wheel speeds *
-  2. Adapt formula to use encoder ticks (more precise) instead of RPM
+  2. Adapt formula to use encoder ticks (more precise) instead of RPM ***ci domandavamo se serve passare attraverso rpm***
   3. Compute a rough estimate of v, ⍵ (with given robot parameters fixed)
   4. Publish v, ⍵ as topic cmd_vel of type geometry_msgs/TwistStamped
- - Compute odometry from v, ⍵ using both Euler and Runge-Kutta integration ***RUNGE KUTTA
-  1. Start with Euler, add Runge-Kutta later
-  2. Add ROS parameter for initial pose (x,y,θ) ???????????(DA GROUND TRUTH)****
-  3. Publish as nav_msgs/Odometry on topic odom **VA CAMBIATO DA THETA al quaternione->Daniele
-  4. Broadcast TF odom->base_link 
-- ROS parameter for initial pose
-- Calibrate (fine-tune) robot parameters (r, l, w, N) to match ground truth *** 
+ - Compute odometry from v, ⍵ using both Euler and Runge-Kutta integration ***RUNGE KUTTA***
+  1. Start with Euler, add Runge-Kutta later  ***LORENZO***
+  2. Add ROS parameter for initial pose (x,y,θ) ****???????????(DA GROUND TRUTH)*** Da chiedere
+  3. Publish as nav_msgs/Odometry on topic odom **VA CAMBIATO DA THETA al quaternione->Daniele**
+  4. Broadcast TF odom->base_link ****????*** ***Da chiedere***
+- Calibrate (fine-tune) robot parameters (r, l, w, N) to match ground truth ***TO DO***
 
 II. Compute wheel control speeds from v, ⍵
  - Compute wheel speeds (RPM) from v, ⍵  
-  1. Reverse the formula obtained at the previous step (I.1) ***elena
-  2. Read v, ⍵ from cmd_vel and apply the obtained formula  ***elena
+  1. Reverse the formula obtained at the previous step (I.1) ***elena***
+  2. Read v, ⍵ from cmd_vel and apply the obtained formula  ***elena***
   3. Publish the computed wheel speed as custom message on topic
      wheels_rpm
-    -The custom message has prototype: *** daniele
+    -The custom message has prototype: ***daniele***
       Header header
       float64 rpm_fl
       float64 rpm_fr
