@@ -2,6 +2,8 @@
 
     <node pkg="callbacks_complete" type="pub_complete" name="my_pub_complete" />
     <node pkg="callbacks_complete" type="sub_complete" name="my_sub_complete" />
+    <node pkg="callbacks_complete" type="velocity" name="my_velocity" output="screen"/>
+
     <node pkg="callbacks_complete" type="Odometry" name="my_Odometry" output="screen"/>
 
 

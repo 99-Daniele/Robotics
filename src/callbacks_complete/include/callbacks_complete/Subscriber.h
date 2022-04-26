@@ -6,6 +6,8 @@
 #include "std_msgs/Int32.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "sensor_msgs/JointState.h"
+#include "nav_msgs/Odometry.h"
+
 
 class Subscriber {
 public:
@@ -14,6 +16,8 @@ public:
   float w=0.169;
   float T=5;
   int N=42;
+
+
   Subscriber(); 
   void main_loop();
 
@@ -28,10 +32,12 @@ private:
 
   ros::Publisher pub;
   ros::Publisher velocity_publisher;
- // int sum;
+  ros::Publisher odometry_publisher;
 
- float old_ticks[4]= {0,0,0,0};
- ros::Time old_time;
+ // int sum;
+   float x_old=0,y_old=0,theta_old=0;
+   float old_ticks[4]= {0,0,0,0};
+   ros::Time old_time;
 };
 
 #endif

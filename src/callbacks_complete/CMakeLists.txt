@@ -32,3 +32,8 @@ target_link_libraries(sub_complete ${catkin_LIBRARIES} subscriber_class)
 add_executable(Odometry src/Odometry.cpp)
 add_dependencies(Odometry ${catkin_EXPORTED_TARGETS})
 target_link_libraries(Odometry ${catkin_LIBRARIES} subscriber_class)
+
+
+add_executable(velocity src/velocity.cpp)
+add_dependencies(velocity ${catkin_EXPORTED_TARGETS})
+target_link_libraries(velocity ${catkin_LIBRARIES} subscriber_class)
