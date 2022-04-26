@@ -15,21 +15,17 @@ Subscriber::Subscriber() { // class constructor
 //  this->sub = this->n.subscribe("count", 1000, &Subscriber::countCallback, this);
   this->sub_wheel = this->n.subscribe("wheel_states", 1000, &Subscriber::wheelCallback, this);
 
-  this->pub = this->n.advertise<std_msgs::Int32>("sum", 1000);
   this->velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   this->odometry_publisher = this->n.advertise<nav_msgs::Odometry>("odom", 1000);
 
-//  this->old_ticks; //l'ho inizializzato in subscriber.h ma non son sicura ce sia corretto
+//  this->old_ticks; //l'ho inizializzato in subscriber.h ma non son sicura che sia corretto
   this->old_time=ros::Time::now();
- // this->sum = 0;
 }
 
 void Subscriber::main_loop() {
   ros::Rate loop_rate(10);
 
   while (ros::ok()) {
-
-    //ROS_INFO("Current sum: %d", this->sum);
 
     ros::spinOnce();
 
@@ -115,6 +111,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     theta=this->theta_old + W*Ts;
 //sarà da implementare runge-kutta(e poi vanno scelti con un if con dymanic reconfigure)
 
+
   //odometry pubblisher
     nav_msgs::Odometry odometry_msg;
 
@@ -146,20 +143,3 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     ros::spinOnce();
 
 }
-
-
-/*
-void Subscriber::countCallback(const std_msgs::Int32::ConstPtr& msg) {
-  ROS_INFO("Received: %d", msg->data);
-
-  // sum is a member variable (i.e., it is defined inside the class)
-  // --> we can access it from anywhere inside the class (using "this->")!
-  this->sum = this->sum + msg->data;
-
-  // We can use this->pub without advertising it every time
-  // (advertising it every time would have been very inefficient)
-  std_msgs::Int32 sum_msg;
-  sum_msg.data = this->sum;
-  this->pub.publish(sum_msg);
-}
-*/

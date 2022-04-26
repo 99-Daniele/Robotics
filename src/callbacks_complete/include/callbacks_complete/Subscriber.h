@@ -30,11 +30,9 @@ private:
   ros::Subscriber sub_wheel;
   //ros::Subscriber sub_pose;
 
-  ros::Publisher pub;
   ros::Publisher velocity_publisher;
   ros::Publisher odometry_publisher;
 
- // int sum;
    float x_old=0,y_old=0,theta_old=0;
    float old_ticks[4]= {0,0,0,0};
    ros::Time old_time;
