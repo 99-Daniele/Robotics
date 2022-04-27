@@ -12,7 +12,6 @@
 
 Subscriber::Subscriber() { // class constructor
   // all initializations here
-//  this->sub = this->n.subscribe("count", 1000, &Subscriber::countCallback, this);
   this->sub_wheel = this->n.subscribe("wheel_states", 1000, &Subscriber::wheelCallback, this);
 
   this->velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
