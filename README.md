@@ -11,8 +11,8 @@ I.Compute odometry using appropriate kinematics
  - Compute odometry from v, ⍵ using both Euler and Runge-Kutta integration ***RUNGE KUTTA***
   1. Start with Euler, add Runge-Kutta later  ***LORENZO***
   2. Add ROS parameter for initial pose (x,y,θ) ****???????????(DA GROUND TRUTH)*** Da chiedere
-  3. Publish as nav_msgs/Odometry on topic odom **VA CAMBIATO DA THETA al quaternione->Daniele**
-  4. Broadcast TF odom->base_link ****????*** ***Da chiedere***
+  3. Publish as nav_msgs/Odometry on topic odom **FATTO (?)**
+  4. Broadcast TF odom->base_link ***????*** ***Da chiedere***
 - Calibrate (fine-tune) robot parameters (r, l, w, N) to match ground truth ***TO DO***
 
 II. Compute wheel control speeds from v, ⍵
@@ -21,7 +21,7 @@ II. Compute wheel control speeds from v, ⍵
   2. Read v, ⍵ from cmd_vel and apply the obtained formula  ***elena***
   3. Publish the computed wheel speed as custom message on topic
      wheels_rpm
-    -The custom message has prototype: ***daniele***
+    -The custom message has prototype:
       Header header
       float64 rpm_fl
       float64 rpm_fr

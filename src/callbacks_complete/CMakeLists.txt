@@ -7,6 +7,8 @@ find_package(
         roscpp
         std_msgs
         message_generation
+        tf2
+        tf2_ros
 )
 
 add_message_files(
