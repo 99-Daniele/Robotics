@@ -4,7 +4,7 @@
 #include "ros/ros.h"
 #include "string"
 
-template<typename SubscribeT,typename PublishT>
+template<typename SubscribeT,typename PublishT> //type of the subscribed message, type of the published message
 class SubPub{
 public:
     SubPub() {}
