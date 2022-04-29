@@ -1,7 +1,11 @@
 # robotics
 ROS projects for robotics class
+
 ***!!! launch senza bag!!!***
+
+
 Goals
+
 I.Compute odometry using appropriate kinematics
  - Compute robot linear and angular velocities v, ⍵ from wheel encoders with mecanum wheels kinematics
   1. Write down the formula to compute v, ⍵ from wheel speeds *
@@ -17,8 +21,8 @@ I.Compute odometry using appropriate kinematics
 
 II. Compute wheel control speeds from v, ⍵
  - Compute wheel speeds (RPM) from v, ⍵  
-  1. Reverse the formula obtained at the previous step (I.1) ***elena***
-  2. Read v, ⍵ from cmd_vel and apply the obtained formula  ***elena***
+  1. Reverse the formula obtained at the previous step (I.1) ***fatto***
+  2. Read v, ⍵ from cmd_vel and apply the obtained formula  ***fatto***
   3. Publish the computed wheel speed as custom message on topic
      wheels_rpm
     -The custom message has prototype:
