@@ -9,6 +9,8 @@
 #include "geometry_msgs/TwistStamped.h"
 #include "sensor_msgs/JointState.h"
 #include "nav_msgs/Odometry.h"
+#include <tf2/LinearMath/Quaternion.h>
+#include <tf2_ros/transform_broadcaster.h>
 
 Subscriber::Subscriber() { // class constructor
   // all initializations here
@@ -39,16 +41,7 @@ void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 }
 */
 void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
-    /*PRINTING BAG VALUES
-     *
-     * for(int i = 0; i < msg->position.size(); i++) {
-        ROS_INFO("Name - %d: %s", i, msg->name[i].c_str());
-        ROS_INFO("Position - %d: %f", i, msg->position[i]);
-        ROS_INFO("Velocity - %d: %f", i, msg->velocity[i]);
-
-
-    }
-     */
+    
     //FROM TICKS TO robot velocity
     float vx;//robot velocity along x
     float vy;//robot speed along y
@@ -85,10 +78,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
 
     geometry_msgs::TwistStamped velocity_msg;
 
-    /* non so se serve mettere anche l'header, ho trovato sta formula ma non credo sia giusta
-    Header header = std_msgs.msg.Header();
-    header.stamp = rospy.Time.now();
-    velocity_msg.header = header;*/
+    
     velocity_msg.header.stamp = msg->header.stamp;//per sincronizzare i dati inviati con il tempo del bag(msg->header.stamp)
 
     velocity_msg.twist.linear.x = vx;
@@ -101,6 +91,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     this->velocity_publisher.publish(velocity_msg);
 
     //**INTEGRATION OF vx, vy and W to find the pose (x,y,theta)
+
     float x,y,theta,Ts;
     Ts = (msg->header.stamp - this->old_time).toSec();
     
@@ -128,6 +119,16 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     odometry_msg.pose.pose.position.x = x;
     odometry_msg.pose.pose.position.y = y;
     odometry_msg.pose.pose.position.z = 0.0;
+
+
+    tf2::Quaternion q;
+    q.setRPY(0, 0, theta); //è giusto questo theta? perchè non ne trovavo altri
+
+    odometry_msg.pose.pose.orientation.x = q.x();
+    odometry_msg.pose.pose.orientation.y = q.y();
+    odometry_msg.pose.pose.orientation.z = q.z();
+    odometry_msg.pose.pose.orientation.w = q.w();
+    
     //odometry_msg.pose.pose.orientation = odom_quat;//devo crearla!!!! con tf2
     //set the velocity
     odometry_msg.child_frame_id = "base_link";
