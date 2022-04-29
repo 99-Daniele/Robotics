@@ -1,3 +1,4 @@
+//class to have a node that can simultaneously subscribe and publish on two different topics
 #ifndef ROBOTICS_SUBPUB_H
 #define ROBOTICS_SUBPUB_H
 
