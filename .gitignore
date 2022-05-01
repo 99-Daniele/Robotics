@@ -10,3 +10,6 @@ devel/lib/
 devel/share/
 .vscode/c_cpp_properties.json
 .vscode/settings.json
+build/
+devel/
+.idea/
