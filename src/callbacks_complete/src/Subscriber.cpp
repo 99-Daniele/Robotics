@@ -15,16 +15,18 @@
 Subscriber::Subscriber() { // class constructor
   // all initializations here
   this->sub_wheel = this->n.subscribe("wheel_states", 1000, &Subscriber::wheelCallback, this);
+  this->sub_Pose = this->n.subscribe("/robot/pose", 1000, &Subscriber::poseCallback, this);
 
   this->velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   this->odometry_publisher = this->n.advertise<nav_msgs::Odometry>("odom", 1000);
-
+  
 //  this->old_ticks; //l'ho inizializzato in subscriber.h ma non son sicura che sia corretto
   this->old_time=ros::Time::now();
 }
 
 void Subscriber::main_loop() {
   ros::Rate loop_rate(10);
+  bool poseSetted = false;
 
   while (ros::ok()) {
 
@@ -34,12 +36,16 @@ void Subscriber::main_loop() {
   }
 }
 
-/*
+
 void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
-    ROS_INFO("My pose_position: %f, %f, %f", msg->pose.position.x, msg->pose.position.y, msg->pose.position.z);
-    ROS_INFO("My pose_orientation: %f, %f, %f, %f", msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w);
+    if(!poseSetted)
+    {
+        ROS_INFO("My pose_position: %f, %f, %f", msg->pose.position.x, msg->pose.position.y, msg->pose.position.z);
+        ROS_INFO("My pose_orientation: %f, %f, %f, %f", msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w);
+        poseSetted = true;
+    }
 }
-*/
+
 void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     
     //FROM TICKS TO robot velocity
@@ -128,7 +134,6 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     odometry_msg.pose.pose.orientation.y = q.y();
     odometry_msg.pose.pose.orientation.z = q.z();
     odometry_msg.pose.pose.orientation.w = q.w();
-    
     //odometry_msg.pose.pose.orientation = odom_quat;//devo crearla!!!! con tf2
     //set the velocity
     odometry_msg.child_frame_id = "base_link";
