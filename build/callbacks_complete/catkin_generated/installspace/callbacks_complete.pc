@@ -1,8 +1,0 @@
-prefix=/home/lorenzonebolosi/Documents/project/robotics/install
-
-Name: callbacks_complete
-Description: Description of callbacks_complete
-Version: 0.0.0
-Cflags: -I${prefix}/include
-Libs: -L${prefix}/lib -lsubscriber_class
-Requires: 
