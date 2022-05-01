@@ -28,7 +28,7 @@ public:
 private:
   ros::NodeHandle n; 
   ros::Subscriber sub_wheel;
-  //ros::Subscriber sub_pose;
+  ros::Subscriber sub_pose;
 
   ros::Publisher velocity_publisher;
   ros::Publisher odometry_publisher;
