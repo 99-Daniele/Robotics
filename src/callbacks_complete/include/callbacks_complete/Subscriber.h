@@ -22,8 +22,9 @@ public:
   void main_loop();
 
 //void countCallback(const std_msgs::Int32::ConstPtr& msg);
-//  void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
+  void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
   void wheelCallback(const sensor_msgs::JointState::ConstPtr& msg);
+  void setPosition(float, float, float);
 
 private:
   ros::NodeHandle n; 
@@ -33,9 +34,10 @@ private:
   ros::Publisher velocity_publisher;
   ros::Publisher odometry_publisher;
 
-   float x_old=0,y_old=0,theta_old=0;
-   float old_ticks[4]= {0,0,0,0};
-   ros::Time old_time;
+  bool poseSetted = false;
+  float x_old=0,y_old=0,theta_old=0;
+  float old_ticks[4]= {0,0,0,0};
+  ros::Time old_time;
 };
 
 #endif
