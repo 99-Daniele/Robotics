@@ -149,12 +149,20 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     ros::spinOnce();
 }
 
-void Subscriber::approximationCallback(callbacks_complete::ApproximationsConfig &config, uint32_t level){
+void Subscriber::approximationCallback(callbacks_complete::ApproximationsConfig &config){
     if(config.approximation = 0)
         ROS_INFO("Approximation changed: EULER");
     else
         ROS_INFO("Approximation changed: RUNGE-KUTTA");
     this->approximationType = config.approximation;
+}
+
+void Subscriber::wheelParametersCallback(callbacks_complete::WheelsConfig &config){
+    ROS_INFO("Changed wheel parameters:\nr = %f\nl = %f\nw = %f\nN = %d", config.r, config.l, config.w, config.N);
+    this->r = config.r;
+    this->l = config.l;
+    this->w = config.w;
+    this->N = config.N;
 }
 
 void Subscriber::setPosition(float x, float y, float theta){

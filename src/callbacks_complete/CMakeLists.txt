@@ -24,6 +24,7 @@ generate_messages(
 
 generate_dynamic_reconfigure_options(
         cfg/ApproximationParameters.cfg
+        cfg/WheelParameters.cfg
 )
 
 ## Declare a catkin package
