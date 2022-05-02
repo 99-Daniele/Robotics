@@ -117,10 +117,6 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     //odometry pubblisher
     nav_msgs::Odometry odometry_msg;
 
-    /* non so se serve mettere anche l'header, ho trovato sta formula ma non credo sia giusta
-    Header header = std_msgs.msg.Header();
-    header.stamp = rospy.Time.now();
-    odometry_msg.header = header;*/
     odometry_msg.header.stamp = msg->header.stamp;//per sincronizzare i dati inviati con il tempo del bag(msg->header.stamp)
     odometry_msg.header.frame_id = "odom";
 
@@ -153,11 +149,11 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     ros::spinOnce();
 }
 
-void Subscriber::approximationCallback(callbacks_complete::approximationsConfig &config){
+void Subscriber::approximationCallback(callbacks_complete::ApproximationsConfig &config, uint32_t level){
     if(config.approximation = 0)
-        ROS_INFO("Approximation changed: %s", "Euler");
+        ROS_INFO("Approximation changed: EULER");
     else
-        ROS_INFO("Approximation changed: %s", "Runge-Kutta");
+        ROS_INFO("Approximation changed: RUNGE-KUTTA");
     this->approximationType = config.approximation;
 }
 
