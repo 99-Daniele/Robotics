@@ -7,6 +7,7 @@
 #include "geometry_msgs/PoseStamped.h"
 #include "sensor_msgs/JointState.h"
 #include "nav_msgs/Odometry.h"
+#include <callbacks_complete/approximationsConfig.h>
 
 
 class Subscriber {
@@ -24,6 +25,7 @@ public:
 //void countCallback(const std_msgs::Int32::ConstPtr& msg);
   void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
   void wheelCallback(const sensor_msgs::JointState::ConstPtr& msg);
+  void approximationCallback(callbacks_complete::approximationsConfig &config);
   void setPosition(float, float, float);
 
 private:
@@ -35,9 +37,10 @@ private:
   ros::Publisher odometry_publisher;
 
   bool poseSetted = false;
-  float x_old=0,y_old=0,theta_old=0;
+  float x_old = 0, y_old = 0, theta_old = 0;
   float old_ticks[4]= {0,0,0,0};
   ros::Time old_time;
+  int approximationType = 0;
 };
 
 #endif

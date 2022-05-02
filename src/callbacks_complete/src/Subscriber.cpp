@@ -101,17 +101,19 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
 
     float x,y,theta,Ts;
     Ts = (msg->header.stamp - this->old_time).toSec();
-    
-    //Euler method
-    x = this->x_old + vx*Ts*cos(this->theta_old)-vy*Ts*sin(this->theta_old);
-    y = this->y_old + vx*Ts*sin(this->theta_old)+vy*Ts*cos(this->theta_old);
-    theta = this->theta_old + W*Ts;
-    
-    //Runge Kutta 
-    x = this->x_old + vx*Ts*cos(this->theta_old + (W * Ts /2)) - vy*Ts*sin(this->theta_old + (W * Ts /2));
-    y = this->y_old + vx*Ts*cos(this->theta_old + (W * Ts /2)) + vy*Ts*sin(this->theta_old + (W * Ts /2));
-    theta = this->theta_old + W*Ts;
-    
+
+    if(this->approximationType = 0) {
+        //Euler method
+        x = this->x_old + vx * Ts * cos(this->theta_old) - vy * Ts * sin(this->theta_old);
+        y = this->y_old + vx * Ts * sin(this->theta_old) + vy * Ts * cos(this->theta_old);
+        theta = this->theta_old + W * Ts;
+    }
+    else {
+        //Runge Kutta
+        x = this->x_old + vx * Ts * cos(this->theta_old + (W * Ts / 2)) - vy * Ts * sin(this->theta_old + (W * Ts / 2));
+        y = this->y_old + vx * Ts * cos(this->theta_old + (W * Ts / 2)) + vy * Ts * sin(this->theta_old + (W * Ts / 2));
+        theta = this->theta_old + W * Ts;
+    }
     //odometry pubblisher
     nav_msgs::Odometry odometry_msg;
 
@@ -129,13 +131,12 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
 
 
     tf2::Quaternion q;
-    q.setRPY(0, 0, theta); //è giusto questo theta? perchè non ne trovavo altri
-
+    q.setRPY(0, 0, theta);
     odometry_msg.pose.pose.orientation.x = q.x();
     odometry_msg.pose.pose.orientation.y = q.y();
     odometry_msg.pose.pose.orientation.z = q.z();
     odometry_msg.pose.pose.orientation.w = q.w();
-    //odometry_msg.pose.pose.orientation = odom_quat;//devo crearla!!!! con tf2
+
     //set the velocity
     odometry_msg.child_frame_id = "base_link";
     odometry_msg.twist.twist.linear.x = vx;
@@ -150,6 +151,14 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
 
 
     ros::spinOnce();
+}
+
+void Subscriber::approximationCallback(callbacks_complete::approximationsConfig &config){
+    if(config.approximation = 0)
+        ROS_INFO("Approximation changed: %s", "Euler");
+    else
+        ROS_INFO("Approximation changed: %s", "Runge-Kutta");
+    this->approximationType = config.approximation;
 }
 
 void Subscriber::setPosition(float x, float y, float theta){

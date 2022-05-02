@@ -9,6 +9,7 @@ find_package(
         message_generation
         tf2
         tf2_ros
+        dynamic_reconfigure
 )
 
 add_message_files(
@@ -19,6 +20,10 @@ add_message_files(
 generate_messages(
         DEPENDENCIES
         std_msgs
+)
+
+generate_dynamic_reconfigure_options(
+        cfg/ApproximationParameters.cfg
 )
 
 ## Declare a catkin package
