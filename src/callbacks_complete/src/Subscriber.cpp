@@ -38,7 +38,7 @@ void Subscriber::main_loop() {
 
 
 void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
-    if(true)
+    if(!poseSetted)
     {
         
         tf2::Quaternion q(msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w);
