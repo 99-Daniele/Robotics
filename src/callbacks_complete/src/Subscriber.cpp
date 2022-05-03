@@ -11,6 +11,7 @@
 #include "nav_msgs/Odometry.h"
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
+#include "tf2/LinearMath/Matrix3x3.h"
 
 Subscriber::Subscriber() { // class constructor
   // all initializations here
@@ -39,7 +40,13 @@ void Subscriber::main_loop() {
 void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
     if(true)
     {
-        this->setPosition(msg->pose.position.x, msg->pose.position.y, msg->pose.position.z);
+        
+        tf2::Quaternion q(msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w);
+        tf2::Matrix3x3 m(q);
+        double roll, pitch, yaw;
+        m.getRPY(roll, pitch, yaw);
+        this->setPosition(msg->pose.position.x, msg->pose.position.y, (float)yaw);
+
         ROS_INFO("POSE SETTED");
         ROS_INFO("My pose_position: %f, %f, %f", msg->pose.position.x, msg->pose.position.y, msg->pose.position.z);
         ROS_INFO("My pose_orientation: %f, %f, %f, %f", msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w);
