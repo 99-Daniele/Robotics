@@ -49,7 +49,6 @@ void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
 
         ROS_INFO("POSE SETTED");
         ROS_INFO("My pose_position: %f, %f, %f", msg->pose.position.x, msg->pose.position.y, msg->pose.position.z);
-        ROS_INFO("My pose_orientation: %f, %f, %f, %f", msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w);
         poseSetted = true;
     }
 }
