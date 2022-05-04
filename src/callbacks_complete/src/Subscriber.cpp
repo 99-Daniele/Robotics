@@ -11,6 +11,7 @@
 #include "nav_msgs/Odometry.h"
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
+#include <geometry_msgs/TransformStamped.h>
 #include "tf2/LinearMath/Matrix3x3.h"
 
 Subscriber::Subscriber() { // class constructor
@@ -95,6 +96,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     }
 
     odometryPublisher(x, vx, y, vy, theta, W, msg->header.stamp);
+    odometryBroadcast(x, vx, y, vy, theta, W, msg->header.stamp);
 
     this->old_time=msg->header.stamp;
 
@@ -123,14 +125,13 @@ void Subscriber::odometryPublisher(float x, float vx, float y, float vy, float t
     nav_msgs::Odometry odometry_msg;
 
     odometry_msg.header.stamp = stamp;
-
     odometry_msg.header.frame_id = "odom";
+    odometry_msg.child_frame_id = "base_link";
 
     //set the position
     odometry_msg.pose.pose.position.x = x;
     odometry_msg.pose.pose.position.y = y;
     odometry_msg.pose.pose.position.z = 0.0;
-
 
     tf2::Quaternion q;
     q.setRPY(0, 0, theta);
@@ -140,7 +141,6 @@ void Subscriber::odometryPublisher(float x, float vx, float y, float vy, float t
     odometry_msg.pose.pose.orientation.w = q.w();
 
     //set the velocity
-    odometry_msg.child_frame_id = "base_link";
     odometry_msg.twist.twist.linear.x = vx;
     odometry_msg.twist.twist.linear.y = vy;
     odometry_msg.twist.twist.angular.z = W;
@@ -149,6 +149,27 @@ void Subscriber::odometryPublisher(float x, float vx, float y, float vy, float t
     this->odometry_publisher.publish(odometry_msg);
 }
 
+void Subscriber::odometryBroadcast(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp){
+
+    geometry_msgs::TransformStamped odometry_tf;
+
+    odometry_tf.header.stamp = stamp;
+    odometry_tf.header.frame_id = "odom";
+    odometry_tf.child_frame_id = "base_link";
+
+    odometry_tf.transform.translation.x = x;
+    odometry_tf.transform.translation.y = y;
+    odometry_tf.transform.translation.z = 0;
+
+    tf2::Quaternion q;
+    q.setRPY(0, 0, theta);
+    odometry_tf.transform.rotation.x = q.x();
+    odometry_tf.transform.rotation.y = q.y();
+    odometry_tf.transform.rotation.z = q.z();
+    odometry_tf.transform.rotation.w = q.w();
+
+    this->br.sendTransform(odometry_tf);
+}
 
 void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
     if(!poseSetted){

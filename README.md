@@ -16,7 +16,7 @@ I.Compute odometry using appropriate kinematics
   1. Start with Euler, add Runge-Kutta later 
   2. Add ROS parameter for initial pose (x,y,θ) ***??????????(DA GROUND TRUTH)Lorenzo***
   3. Publish as nav_msgs/Odometry on topic odom
-  4. Broadcast TF odom->base_link ***lab5*** ***Daniele***
+  4. Broadcast TF odom->base_link **fatto**
   5. - structure of the TF tree ***DA GENERARE PER IL FILE***
 - Calibrate (fine-tune) robot parameters (r, l, w, N) to match ground truth ***fatto...Elena->rviz e posizione ottenuta***
 

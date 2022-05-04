@@ -7,12 +7,15 @@
 #include "geometry_msgs/PoseStamped.h"
 #include "sensor_msgs/JointState.h"
 #include "nav_msgs/Odometry.h"
+#include <tf2_ros/transform_broadcaster.h>
 #include <dynamic_reconfigure/server.h>
 #include <callbacks_complete/ApproximationsConfig.h>
 #include <callbacks_complete/WheelsConfig.h>
 
 class Subscriber {
 public:
+
+  tf2_ros::TransformBroadcaster br;
 
   float r=0.07;
   float l=0.200;
@@ -30,12 +33,13 @@ public:
   void wheelCallback(const sensor_msgs::JointState::ConstPtr& msg);
   void velocityPublisher(float vx, float vy, float W, ros::Time stamp);
   void odometryPublisher(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp);
+  void odometryBroadcast(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp);
   void approximationCallback(int approximation);
   void wheelParametersCallback(float r, float l, float w, int N, int level);
   void setPosition(float, float, float);
 
 private:
-  ros::NodeHandle n; 
+  ros::NodeHandle n;
   ros::Subscriber sub_wheel;
   ros::Subscriber sub_pose;
 
