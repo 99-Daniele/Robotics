@@ -36,23 +36,6 @@ void Subscriber::main_loop() {
   }
 }
 
-
-void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
-    if(!poseSetted)
-    {
-        
-        tf2::Quaternion q(msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w);
-        tf2::Matrix3x3 m(q);
-        double roll, pitch, yaw;
-        m.getRPY(roll, pitch, yaw);
-        this->setPosition(msg->pose.position.x, msg->pose.position.y, (float)yaw);
-
-        ROS_INFO("POSE SETTED");
-        ROS_INFO("My pose_position: %f, %f, %f", msg->pose.position.x, msg->pose.position.y, msg->pose.position.z);
-        poseSetted = true;
-    }
-}
-
 void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     
     //FROM TICKS TO robot velocity
@@ -87,21 +70,11 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     //codice per pubblicare v e w. considero vx = vx, vy = vy, vz = 0; wx = 0, wy = 0, wz = W (non sono sicura che l'angular sia solo wz, ma direi di si)
 
     //l'ho commentato perchè faCCIO L'ADVERTISE UNA VOLTA SOLA, altrimenti mi spesso non vedevo il topic
+
     // ros::Publisher velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
 
-    geometry_msgs::TwistStamped velocity_msg;
+    velocityPublisher(vx, vy, W, msg->header.stamp);
 
-    
-    velocity_msg.header.stamp = msg->header.stamp;//per sincronizzare i dati inviati con il tempo del bag(msg->header.stamp)
-
-    velocity_msg.twist.linear.x = vx;
-    velocity_msg.twist.linear.y = vy;
-    velocity_msg.twist.linear.z = 0;
-    velocity_msg.twist.angular.x = 0;
-    velocity_msg.twist.angular.y = 0;
-    velocity_msg.twist.angular.z = W;
-
-    this->velocity_publisher.publish(velocity_msg);
 
     //**INTEGRATION OF vx, vy and W to find the pose (x,y,theta)
 
@@ -120,10 +93,37 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
         y = this->y_old + vx * Ts * cos(this->theta_old + (W * Ts / 2)) + vy * Ts * sin(this->theta_old + (W * Ts / 2));
         theta = this->theta_old + W * Ts;
     }
-    //odometry pubblisher
+
+    odometryPublisher(x, vx, y, vy, theta, W, msg->header.stamp);
+
+    this->old_time=msg->header.stamp;
+
+    ros::spinOnce();
+}
+
+void Subscriber::velocityPublisher(float vx, float vy, float W, ros::Time stamp){
+
+    geometry_msgs::TwistStamped velocity_msg;
+
+    velocity_msg.header.stamp = stamp;
+
+    velocity_msg.twist.linear.x = vx;
+    velocity_msg.twist.linear.y = vy;
+    velocity_msg.twist.linear.z = 0;
+
+    velocity_msg.twist.angular.x = 0;
+    velocity_msg.twist.angular.y = 0;
+    velocity_msg.twist.angular.z = W;
+
+    this->velocity_publisher.publish(velocity_msg);
+}
+
+void Subscriber::odometryPublisher(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp){
+
     nav_msgs::Odometry odometry_msg;
 
-    odometry_msg.header.stamp = msg->header.stamp;//per sincronizzare i dati inviati con il tempo del bag(msg->header.stamp)
+    odometry_msg.header.stamp = stamp;
+
     odometry_msg.header.frame_id = "odom";
 
     //set the position
@@ -147,12 +147,22 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
 
     //publish the message
     this->odometry_publisher.publish(odometry_msg);
+}
 
 
-    this->old_time=msg->header.stamp;
+void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
+    if(!poseSetted){
 
+        tf2::Quaternion q(msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w);
+        tf2::Matrix3x3 m(q);
+        double roll, pitch, yaw;
+        m.getRPY(roll, pitch, yaw);
+        this->setPosition(msg->pose.position.x, msg->pose.position.y, (float)yaw);
 
-    ros::spinOnce();
+        ROS_INFO("POSE SETTED");
+        ROS_INFO("My pose_position: %f, %f, %f", msg->pose.position.x, msg->pose.position.y, msg->pose.position.z);
+        poseSetted = true;
+    }
 }
 
 void Subscriber::approximationCallback(int approximation){

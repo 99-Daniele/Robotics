@@ -28,6 +28,8 @@ public:
 //void countCallback(const std_msgs::Int32::ConstPtr& msg);
   void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
   void wheelCallback(const sensor_msgs::JointState::ConstPtr& msg);
+  void velocityPublisher(float vx, float vy, float W, ros::Time stamp);
+  void odometryPublisher(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp);
   void approximationCallback(int approximation);
   void wheelParametersCallback(float r, float l, float w, int N, int level);
   void setPosition(float, float, float);
