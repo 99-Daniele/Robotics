@@ -18,7 +18,7 @@ I.Compute odometry using appropriate kinematics
   3. Publish as nav_msgs/Odometry on topic odom
   4. Broadcast TF odom->base_link ***lab5*** ***Daniele***
   5. - structure of the TF tree ***DA GENERARE PER IL FILE***
-- Calibrate (fine-tune) robot parameters (r, l, w, N) to match ground truth ***Daniele->dynami reconfigure...Elena->rviz e posizione ottenuta***
+- Calibrate (fine-tune) robot parameters (r, l, w, N) to match ground truth ***fatto...Elena->rviz e posizione ottenuta***
 
 II. Compute wheel control speeds from v, ⍵
  - Compute wheel speeds (RPM) from v, ⍵  
@@ -35,7 +35,7 @@ II. Compute wheel control speeds from v, ⍵
  - Check that the results match the recorded encoders values, apart from some noise
      You could use rqt_plot or plotjuggler  ***Elena***
 III. Add a service to reset the odometry to a specified pose (x,y,θ)  ***Lorenzo***
-IV. Use dynamic reconfigure to select between integration method     ***Daniele**
+IV. Use dynamic reconfigure to select between integration method     ***fatto**
    - Use an enum with 2 values: Euler, RK
 
 
