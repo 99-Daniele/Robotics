@@ -149,6 +149,7 @@ void Subscriber::odometryPublisher(float x, float vx, float y, float vy, float t
     this->odometry_publisher.publish(odometry_msg);
 }
 
+//rviz, rosrun tf tf_echo \odom \base_link, rosrun rqt_tf_tree rqt_tf_tree comandi per il tuning....o almeno credo siano questi
 void Subscriber::odometryBroadcast(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp){
 
     geometry_msgs::TransformStamped odometry_tf;
