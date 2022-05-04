@@ -108,7 +108,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     float x,y,theta,Ts;
     Ts = (msg->header.stamp - this->old_time).toSec();
 
-    if(this->approximationType = 0) {
+    if(this->approximationType == 0) {
         //Euler method
         x = this->x_old + vx * Ts * cos(this->theta_old) - vy * Ts * sin(this->theta_old);
         y = this->y_old + vx * Ts * sin(this->theta_old) + vy * Ts * cos(this->theta_old);
@@ -155,20 +155,34 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     ros::spinOnce();
 }
 
-void Subscriber::approximationCallback(callbacks_complete::ApproximationsConfig &config){
-    if(config.approximation = 0)
+void Subscriber::approximationCallback(int approximation){
+    if(approximation == 0)
         ROS_INFO("Approximation changed: EULER");
     else
         ROS_INFO("Approximation changed: RUNGE-KUTTA");
-    this->approximationType = config.approximation;
+    this->approximationType = approximation;
 }
 
-void Subscriber::wheelParametersCallback(callbacks_complete::WheelsConfig &config){
-    ROS_INFO("Changed wheel parameters:\nr = %f\nl = %f\nw = %f\nN = %d", config.r, config.l, config.w, config.N);
-    this->r = config.r;
-    this->l = config.l;
-    this->w = config.w;
-    this->N = config.N;
+void Subscriber::wheelParametersCallback(float r, float l, float w, int N, int level){
+    switch(level){
+        case 0:
+            this->r = r;
+            ROS_INFO("r parameter changed: %f", this->r);
+            break;
+        case 1:
+            this->l = l;
+            ROS_INFO("l parameter changed: %f", this->l);
+            break;
+        case 2:
+            this->w = w;
+            ROS_INFO("w parameter changed: %f", this->w);
+            break;
+        case 3:
+            this->N = N;
+            ROS_INFO("N parameter changed: %d", this->N);
+            break;
+    }
+    ROS_INFO("r: %f, l: %f, w: %f, N: %d", this->r, this->l, this->w, this->N);
 }
 
 void Subscriber::setPosition(float x, float y, float theta){
