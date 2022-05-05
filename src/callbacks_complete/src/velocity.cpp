@@ -2,7 +2,7 @@
 #include "geometry_msgs/TwistStamped.h"
 #include "callbacks_complete/Subscriber.h"
 #include "callbacks_complete/RPM.h"
-#include "SubPub.h"
+#include "callbacks_complete/SubPub.h"
 
 template<>
 void SubPub<geometry_msgs::TwistStamped,callbacks_complete::RPM>::subscriberCallback(const geometry_msgs::TwistStamped::ConstPtr& msg) {
