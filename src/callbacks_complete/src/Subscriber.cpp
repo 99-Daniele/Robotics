@@ -107,6 +107,9 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     odometryBroadcast(x, vx, y, vy, theta, W, msg->header.stamp);
 
     this->old_time=msg->header.stamp;
+    this->x_old = x;
+    this->y_old = y;
+    this->theta_old = theta;
 
     ros::spinOnce();
 }
