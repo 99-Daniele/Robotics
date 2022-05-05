@@ -10,17 +10,21 @@ void SubPub<geometry_msgs::TwistStamped,callbacks_complete::RPM>::subscriberCall
     ROS_INFO("Linear velocity: x = %f, y = %f, z = %f", msg->twist.linear.x, msg->twist.linear.y, msg->twist.linear.z);
     ROS_INFO("Angular velocity: x = %f, y = %f, z = %f", msg->twist.angular.x, msg->twist.angular.y, msg->twist.angular.z);
     //float w0,w1,w2,w3;
-    Subscriber s;
+    float r, l, w;
+    n.getParam("/r", r);
+    n.getParam("/l", l);
+    n.getParam("/w", w);
 /*
     ros::NodeHandle n;
 
     ros:: Publisher wheels_rpm_pub = n.advertise<callbacks_complete::RPM>("wheels_rpm", 1000);
 */
     callbacks_complete::RPM wheel_speed;
-    wheel_speed.rpm_fl=1/s.r*(msg->twist.linear.x-msg->twist.linear.y-(s.l+s.w)*msg->twist.angular.z);
-    wheel_speed.rpm_fr=1/s.r*(msg->twist.linear.x+msg->twist.linear.y+(s.l+s.w)*msg->twist.angular.z);
-    wheel_speed.rpm_rl=1/s.r*(msg->twist.linear.x+msg->twist.linear.y-(s.l+s.w)*msg->twist.angular.z);
-    wheel_speed.rpm_rr=1/s.r*(msg->twist.linear.x-msg->twist.linear.y+(s.l+s.w)*msg->twist.angular.z);
+    wheel_speed.header.stamp = msg->header.stamp;
+    wheel_speed.rpm_fl=1/r*(msg->twist.linear.x-msg->twist.linear.y-(l+w)*msg->twist.angular.z);
+    wheel_speed.rpm_fr=1/r*(msg->twist.linear.x+msg->twist.linear.y+(l+w)*msg->twist.angular.z);
+    wheel_speed.rpm_rl=1/r*(msg->twist.linear.x+msg->twist.linear.y-(l+w)*msg->twist.angular.z);
+    wheel_speed.rpm_rr=1/r*(msg->twist.linear.x-msg->twist.linear.y+(l+w)*msg->twist.angular.z);
 
     ROS_INFO("fl: %f, fr: %f, rl: %f, rr: %f", wheel_speed.rpm_fl,wheel_speed.rpm_fr,wheel_speed.rpm_rl,wheel_speed.rpm_rr);
     publisherObject.publish(wheel_speed);
