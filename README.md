@@ -16,26 +16,36 @@ I.Compute odometry using appropriate kinematics
   2. Add ROS parameter for initial pose (x,y,θ) ✔
   3. Publish as nav_msgs/Odometry on topic odom ✔
   4. Broadcast TF odom->base_link ✔
-  5. - structure of the TF tree ***DA GENERARE PER IL FILE***
+  5. Structure of the TF tree **DA GENERARE PER IL FILE**
 - Calibrate (fine-tune) robot parameters (r, l, w, N) to match ground truth **Daniele**
 
 II. Compute wheel control speeds from v, ⍵
  - Compute wheel speeds (RPM) from v, ⍵  
   1. Reverse the formula obtained at the previous step (I.1) 
   2. Read v, ⍵ from cmd_vel and apply the obtained formula 
-  3. Publish the computed wheel speed as custom message on topic
-     wheels_rpm
-    -The custom message has prototype:
+  3. Publish the computed wheel speed as custom message on topic wheels_rpm
+    
+     The custom message has prototype:
+      
       Header header
+      
       float64 rpm_fl
+      
       float64 rpm_fr
+      
       float64 rpm_rr
+      
       float64 rpm_rl
  - Check that the results match the recorded encoders values, apart from some noise
-     You could use rqt_plot or plotjuggler  ***Elena***
-III. Add a service to reset the odometry to a specified pose (x,y,θ)  ***Lorenzo***
+     
+     You could use rqt_plot or plotjuggler  **Elena**
+
+III. Add a service to reset the odometry to a specified pose (x,y,θ)  **Lorenzo**
+
 IV. Use dynamic reconfigure to select between integration method ✔
    - Use an enum with 2 values: Euler, RK
+
+
 
 
 
