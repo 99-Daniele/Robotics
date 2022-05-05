@@ -29,6 +29,14 @@ Subscriber::Subscriber() { // class constructor
 void Subscriber::main_loop() {
   ros::Rate loop_rate(10);
 
+  n.getParam("/r", r);
+  n.getParam("/l", l);
+  n.getParam("/w", w);
+  n.getParam("/N", N);
+  n.getParam("/T", T);
+  n.getParam("/initialApproximation", approximationType);
+  ROS_INFO("r: %f, l: %f, w: %f, N: %d, T: %d, aprx: %d", r, l, w, N, T, approximationType);
+
   while (ros::ok()) {
 
     ros::spinOnce();
@@ -174,7 +182,6 @@ void Subscriber::odometryBroadcast(float x, float vx, float y, float vy, float t
 
 void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
     if(!poseSetted){
-
         tf2::Quaternion q(msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w);
         tf2::Matrix3x3 m(q);
         double roll, pitch, yaw;

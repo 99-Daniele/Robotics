@@ -16,14 +16,12 @@ class Subscriber {
 public:
 
   tf2_ros::TransformBroadcaster br;
-
-  float r=0.07;
-  float l=0.200;
-  float w=0.169;
-  int N=42;
-  float T=5;
-
-  int approximationType = 0;
+  float r;
+  float l;
+  float w;
+  int N;
+  int T;
+  int approximationType;
 
   Subscriber(); 
   void main_loop();
