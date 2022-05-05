@@ -56,16 +56,16 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     float numVy;
     float numW;
 
-    numVx = (msg->position[0] - this->old_ticks[0] + msg->position[ 1] - this->old_ticks[1] + msg->position[2] - this->old_ticks[2] + msg->position[3] - this->old_ticks[3]);
-    numVy = (-(msg->position[0] - this->old_ticks[0]) + msg->position[1] - this->old_ticks[1] + msg->position[2] - this->old_ticks[2] - (msg->position[3] - this->old_ticks[3]));
-    numW = (-(msg->position[0] - this->old_ticks[0]) + msg->position[1] - this->old_ticks[1] - (msg->position[2] - this->old_ticks[2]) + (msg->position[3] - this->old_ticks[3]));
+    numVx = ((msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) + (msg->position[2] - this->old_ticks[2]) + (msg->position[3] - this->old_ticks[3]));
+    numVy = (-(msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) + (msg->position[2] - this->old_ticks[2]) - (msg->position[3] - this->old_ticks[3]));
+    numW = (-(msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) - (msg->position[2] - this->old_ticks[2]) + (msg->position[3] - this->old_ticks[3]));
 
     //ROS_INFO("Duration seconds: %d, and nanoseconds: %d", msg->header.stamp.sec, msg->header.stamp.nsec);
     //ROS_INFO("Duration in seconds: %lf", msg->header.stamp.toSec());
         //vx=numVx*2*pi/((time-past_time)*N(=42)*T(=5))*r/4
     vx = numVx*r*M_PI / N / 2 / T / (msg->header.stamp - this->old_time).toSec();
     vy = numVy*r*M_PI / N / 2 / T / (msg->header.stamp - this->old_time).toSec();
-    W = numVy*r*M_PI / N / 2 / T /(l+w)/ (msg->header.stamp - this->old_time).toSec();
+    W = numW*r*M_PI / N / 2 / T /(l+w)/ (msg->header.stamp - this->old_time).toSec();
 
 
 
