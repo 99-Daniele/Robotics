@@ -38,7 +38,7 @@ II. Compute wheel control speeds from v, ⍵
       float64 rpm_rl
  - Check that the results match the recorded encoders values, apart from some noise
      
-     You could use rqt_plot or plotjuggler  **Elena**
+     You could use rqt_plot or plotjuggler  **✔**
 
 III. Add a service to reset the odometry to a specified pose (x,y,θ)  **Lorenzo**
 
