@@ -16,22 +16,21 @@ class Subscriber {
 public:
 
   tf2_ros::TransformBroadcaster br;
-  float r;
-  float l;
-  float w;
-  int N;
-  int T;
-  int approximationType;
+  float r = 0.07;
+  float l = 0.2;
+  float w = 0.169;
+  int N = 42;
+  int T = 5;
+  int approximationType = 0;
 
-  Subscriber(); 
+  Subscriber();
+
   void main_loop();
-
-//void countCallback(const std_msgs::Int32::ConstPtr& msg);
   void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
   void wheelCallback(const sensor_msgs::JointState::ConstPtr& msg);
   void velocityPublisher(float vx, float vy, float W, ros::Time stamp);
   void odometryPublisher(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp);
-  void odometryBroadcast(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp);
+  void odometryBroadcast(float x, float y, float theta, ros::Time stamp);
   void approximationCallback(int approximation);
   void wheelParametersCallback(float r, float l, float w, int N, int level);
   void setPosition(float, float, float);

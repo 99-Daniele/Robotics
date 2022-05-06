@@ -18,10 +18,11 @@ void SubPub<geometry_msgs::TwistStamped,callbacks_complete::RPM>::subscriberCall
     ROS_INFO("Linear velocity: vx = %f, vy = %f, vz = %f", vx, vy, vz);
     ROS_INFO("Angular velocity: wx = %f, wy = %f, wz = %f", wx, wy, wz);
     //float w0,w1,w2,w3;
-    float r, l, w;
-    n.getParam("/r", r);
-    n.getParam("/l", l);
-    n.getParam("/w", w);
+
+    Subscriber s;
+    float r = s.r;
+    float l = s.l;
+    float w = s.w;
 /*
     ros::NodeHandle n;
 

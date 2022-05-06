@@ -29,14 +29,6 @@ Subscriber::Subscriber() { // class constructor
 void Subscriber::main_loop() {
   ros::Rate loop_rate(10);
 
-  n.getParam("/r", r);
-  n.getParam("/l", l);
-  n.getParam("/w", w);
-  n.getParam("/N", N);
-  n.getParam("/T", T);
-  n.getParam("/initialApproximation", approximationType);
-  ROS_INFO("r: %f, l: %f, w: %f, N: %d, T: %d, aprx: %d", r, l, w, N, T, approximationType);
-
   while (ros::ok()) {
 
     ros::spinOnce();
@@ -63,9 +55,9 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     //ROS_INFO("Duration seconds: %d, and nanoseconds: %d", msg->header.stamp.sec, msg->header.stamp.nsec);
     //ROS_INFO("Duration in seconds: %lf", msg->header.stamp.toSec());
         //vx=numVx*2*pi/((time-past_time)*N(=42)*T(=5))*r/4
-    vx = numVx*r*M_PI / N / 2 / T / (msg->header.stamp - this->old_time).toSec();
-    vy = numVy*r*M_PI / N / 2 / T / (msg->header.stamp - this->old_time).toSec();
-    W = numW*r*M_PI / N / 2 / T /(l+w)/ (msg->header.stamp - this->old_time).toSec();
+    vx = (numVx*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
+    vy = (numVy*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
+    W = (numW*r*M_PI) / (N * 2 * T * (l + w) * (msg->header.stamp - this->old_time).toSec());
 
 
 
@@ -99,12 +91,12 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     else {
         //Runge Kutta
         x = this->x_old + vx * Ts * cos(this->theta_old + (W * Ts / 2)) - vy * Ts * sin(this->theta_old + (W * Ts / 2));
-        y = this->y_old + vx * Ts * cos(this->theta_old + (W * Ts / 2)) + vy * Ts * sin(this->theta_old + (W * Ts / 2));
+        y = this->y_old + vx * Ts * sin(this->theta_old + (W * Ts / 2)) + vy * Ts * cos(this->theta_old + (W * Ts / 2));
         theta = this->theta_old + W * Ts;
     }
 
     odometryPublisher(x, vx, y, vy, theta, W, msg->header.stamp);
-    odometryBroadcast(x, vx, y, vy, theta, W, msg->header.stamp);
+    odometryBroadcast(x, y, theta, msg->header.stamp);
 
     this->old_time=msg->header.stamp;
     this->x_old = x;
@@ -145,7 +137,7 @@ void Subscriber::odometryPublisher(float x, float vx, float y, float vy, float t
     odometry_msg.pose.pose.position.z = 0.0;
 
     tf2::Quaternion q;
-    q.setRPY(0, 0, theta);
+    q.setRPY(0.0, 0.0, theta);
     odometry_msg.pose.pose.orientation.x = q.x();
     odometry_msg.pose.pose.orientation.y = q.y();
     odometry_msg.pose.pose.orientation.z = q.z();
@@ -154,6 +146,10 @@ void Subscriber::odometryPublisher(float x, float vx, float y, float vy, float t
     //set the velocity
     odometry_msg.twist.twist.linear.x = vx;
     odometry_msg.twist.twist.linear.y = vy;
+    odometry_msg.twist.twist.linear.z = 0.0;
+
+    odometry_msg.twist.twist.angular.x = 0.0;
+    odometry_msg.twist.twist.angular.y = 0.0;
     odometry_msg.twist.twist.angular.z = W;
 
     //publish the message
@@ -161,7 +157,7 @@ void Subscriber::odometryPublisher(float x, float vx, float y, float vy, float t
 }
 
 //rviz, rosrun tf tf_echo \odom \base_link, rosrun rqt_tf_tree rqt_tf_tree comandi per il tuning....o almeno credo siano questi
-void Subscriber::odometryBroadcast(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp){
+void Subscriber::odometryBroadcast(float x, float y, float theta, ros::Time stamp){
 
     geometry_msgs::TransformStamped odometry_tf;
 
@@ -171,10 +167,10 @@ void Subscriber::odometryBroadcast(float x, float vx, float y, float vy, float t
 
     odometry_tf.transform.translation.x = x;
     odometry_tf.transform.translation.y = y;
-    odometry_tf.transform.translation.z = 0;
+    odometry_tf.transform.translation.z = 0.0;
 
     tf2::Quaternion q;
-    q.setRPY(0, 0, theta);
+    q.setRPY(0.0, 0.0, theta);
     odometry_tf.transform.rotation.x = q.x();
     odometry_tf.transform.rotation.y = q.y();
     odometry_tf.transform.rotation.z = q.z();
@@ -192,7 +188,7 @@ void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
         this->setPosition(msg->pose.position.x, msg->pose.position.y, (float)yaw);
 
         ROS_INFO("POSE SETTED");
-        ROS_INFO("My pose_position: %f, %f, %f", msg->pose.position.x, msg->pose.position.y, msg->pose.position.z);
+        ROS_INFO("My pose_position: %f, %f, %f, %f, %f, %f", msg->pose.position.x, msg->pose.position.y, msg->pose.position.z, yaw, pitch, roll);
         poseSetted = true;
     }
 }
