@@ -42,6 +42,7 @@ private:
 
   ros::Publisher velocity_publisher;
   ros::Publisher odometry_publisher;
+  ros::Publisher tick_vel_pub;
 
   bool poseSetted = false;
   float x_old = 0, y_old = 0, theta_old = 0;

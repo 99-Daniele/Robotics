@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include "callbacks_complete/Subscriber.h"
+#include "callbacks_complete/RPM.h"
 
 #include "ros/ros.h"
 #include "geometry_msgs/PoseStamped.h"
@@ -21,7 +22,7 @@ Subscriber::Subscriber() { // class constructor
 
   this->velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   this->odometry_publisher = this->n.advertise<nav_msgs::Odometry>("odom", 1000);
-  
+  this->tick_vel_pub=this->n.advertise<callbacks_complete::RPM>("ticks_vel",100);
 //  this->old_ticks; //l'ho inizializzato in subscriber.h ma non son sicura che sia corretto
   this->old_time=ros::Time::now();
 }
@@ -48,6 +49,16 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     float numVy;
     float numW;
 
+    //ticks to RPM ci serve per poi confrontarla con gli RPM calcolati in velocity
+    callbacks_complete::RPM ticks_RPM;
+    ticks_RPM.header.stamp = msg->header.stamp;
+    ticks_RPM.rpm_fl=((msg->position[0] - this->old_ticks[0])*2*M_PI)/(N * T * (msg->header.stamp - this->old_time).toSec());////////
+    ticks_RPM.rpm_fr=((msg->position[1] - this->old_ticks[1])*2*M_PI)/(N * T *(msg->header.stamp - this->old_time).toSec());
+    ticks_RPM.rpm_rl=((msg->position[2] - this->old_ticks[2])*2*M_PI)/(N * T *(msg->header.stamp - this->old_time).toSec());
+    ticks_RPM.rpm_rr=((msg->position[3] - this->old_ticks[3])*2*M_PI)/(N * T *(msg->header.stamp - this->old_time).toSec());
+
+    this->tick_vel_pub.publish(ticks_RPM);
+
     numVx = ((msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) + (msg->position[2] - this->old_ticks[2]) + (msg->position[3] - this->old_ticks[3]));
     numVy = (-(msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) + (msg->position[2] - this->old_ticks[2]) - (msg->position[3] - this->old_ticks[3]));
     numW = (-(msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) - (msg->position[2] - this->old_ticks[2]) + (msg->position[3] - this->old_ticks[3]));
@@ -58,6 +69,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     vx = (numVx*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
     vy = (numVy*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
     W = (numW*r*M_PI) / (N * 2 * T * (l + w) * (msg->header.stamp - this->old_time).toSec());
+
 
 
 

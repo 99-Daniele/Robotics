@@ -30,10 +30,10 @@ void SubPub<geometry_msgs::TwistStamped,callbacks_complete::RPM>::subscriberCall
 */
     callbacks_complete::RPM wheel_speed;
     wheel_speed.header.stamp = msg->header.stamp;
-    wheel_speed.rpm_fl=1/r*(vx-vy-(l+w)*wz);
-    wheel_speed.rpm_fr=1/r*(vx+vy+(l+w)*wz);
-    wheel_speed.rpm_rl=1/r*(vx+vy-(l+w)*wz);
-    wheel_speed.rpm_rr=1/r*(vx-vy+(l+w)*wz);
+    wheel_speed.rpm_fl=(vx-vy-(l+w)*wz)/r;
+    wheel_speed.rpm_fr=(vx+vy+(l+w)*wz)/r;
+    wheel_speed.rpm_rl=(vx+vy-(l+w)*wz)/r;
+    wheel_speed.rpm_rr=(vx-vy+(l+w)*wz)/r;
 
     ROS_INFO("fl: %f, fr: %f, rl: %f, rr: %f", wheel_speed.rpm_fl,wheel_speed.rpm_fr,wheel_speed.rpm_rl,wheel_speed.rpm_rr);
     publisherObject.publish(wheel_speed);
