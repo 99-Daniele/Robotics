@@ -19,10 +19,10 @@ void SubPub<geometry_msgs::TwistStamped,callbacks_complete::RPM>::subscriberCall
     ROS_INFO("Angular velocity: wx = %f, wy = %f, wz = %f", wx, wy, wz);
     //float w0,w1,w2,w3;
 
-    Subscriber s;
-    float r = s.r;
-    float l = s.l;
-    float w = s.w;
+   // Subscriber s;   //Da riprendere dal launcher
+    float r = 0;
+    float l = 0;
+    float w = 0;
 /*
     ros::NodeHandle n;
 

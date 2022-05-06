@@ -22,7 +22,7 @@ Subscriber::Subscriber() { // class constructor
 
   this->velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   this->odometry_publisher = this->n.advertise<nav_msgs::Odometry>("odom", 1000);
-  this->tick_vel_pub=this->n.advertise<callbacks_complete::RPM>("ticks_vel",100);
+  this->tick_vel_pub=this->n.advertise<callbacks_complete::RPM>("ticks_to_RPM",100);
 //  this->old_ticks; //l'ho inizializzato in subscriber.h ma non son sicura che sia corretto
   this->old_time=ros::Time::now();
 }
@@ -71,7 +71,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     W = (numW*r*M_PI) / (N * 2 * T * (l + w) * (msg->header.stamp - this->old_time).toSec());
 
 
-
+///accorcio le formule!!!!!!
 
     for (int i = 0; i < msg->position.size(); i++){
         this->old_ticks[i]=msg->position[i];
