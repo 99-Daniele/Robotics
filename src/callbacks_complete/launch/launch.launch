@@ -1,9 +1,9 @@
 <launch>
 
-    <param name="r" value="0.07"/>
+    <param name="r" value="0.075"/>
     <param name="l" value="0.2"/>
     <param name="w" value="0.169"/>
-    <param name="N" value="42"/>
+    <param name="N" value="41"/>
     <param name="T" value="5"/>
     <param name="initialApproximation" value="0"/>
 
@@ -12,9 +12,9 @@
     <node pkg="callbacks_complete" type="velocity" name="my_velocity" output="screen"/>
     <node pkg="callbacks_complete" type="Odometry" name="my_Odometry" output="screen"/>
 
-    <node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0 0 0 0 0 0 1 world odom " />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.005 0.0035 0.37 0 0 0 1 world odom " />
 
-    <arg name="path" default=" $(find callbacks_complete)/bags/bag1" />
+    <arg name="path" default=" $(find callbacks_complete)/bags/bag3" />
     <node pkg="rosbag" type="play" name="player" output="screen" args="--clock  $(arg path).bag">
     </node>
 
