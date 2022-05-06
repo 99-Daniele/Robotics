@@ -29,6 +29,12 @@ Subscriber::Subscriber() { // class constructor
 
 void Subscriber::main_loop() {
   ros::Rate loop_rate(10);
+  n.getParam("/r", r);
+  n.getParam("/l", l);
+  n.getParam("/w", w);
+  n.getParam("/N", N);
+  n.getParam("/T", T);
+  n.getParam("/initialApproximation", approximationType);
 
   while (ros::ok()) {
 
@@ -76,10 +82,6 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     for (int i = 0; i < msg->position.size(); i++){
         this->old_ticks[i]=msg->position[i];
     }
-
-    ROS_INFO("numVx: %f, vx: %f,   numVy %f, vy: %f", numVx, vx, numVy,vy);
-
-
     //codice per pubblicare v e w. considero vx = vx, vy = vy, vz = 0; wx = 0, wy = 0, wz = W (non sono sicura che l'angular sia solo wz, ma direi di si)
 
     //l'ho commentato perchè faCCIO L'ADVERTISE UNA VOLTA SOLA, altrimenti mi spesso non vedevo il topic
@@ -168,7 +170,6 @@ void Subscriber::odometryPublisher(float x, float vx, float y, float vy, float t
     this->odometry_publisher.publish(odometry_msg);
 }
 
-//rviz, rosrun tf tf_echo \odom \base_link, rosrun rqt_tf_tree rqt_tf_tree comandi per il tuning....o almeno credo siano questi
 void Subscriber::odometryBroadcast(float x, float y, float theta, ros::Time stamp){
 
     geometry_msgs::TransformStamped odometry_tf;
@@ -188,7 +189,7 @@ void Subscriber::odometryBroadcast(float x, float y, float theta, ros::Time stam
     odometry_tf.transform.rotation.z = q.z();
     odometry_tf.transform.rotation.w = q.w();
 
-    this->br.sendTransform(odometry_tf);
+    br.sendTransform(odometry_tf);
 }
 
 void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
@@ -202,6 +203,184 @@ void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
         ROS_INFO("POSE SETTED");
         ROS_INFO("My pose_position: %f, %f, %f, %f, %f, %f", msg->pose.position.x, msg->pose.position.y, msg->pose.position.z, yaw, pitch, roll);
         poseSetted = true;
+    }
+    /*float pose_x = msg->pose.position.x;
+    float odom_x = x_old;
+    float pose_y = msg->pose.position.y;
+    float odom_y = y_old;
+    float differential = (odom_x - pose_x) * (odom_y - pose_y);
+    changeR(differential);
+    changeL(differential);
+    changeW(differential);
+    changeN(differential);
+    float total_r = r_avg * count;
+    float total_l = l_avg * count;
+    float total_w = w_avg * count;
+    float total_N = N_avg * count;
+    float total_d = differential_avg * count;
+    count++;
+    r_avg = (total_r + r)/count;
+    l_avg = (total_l + l)/count;
+    w_avg = (total_w + w)/count;
+    N_avg = (total_N + N)/count;
+    differential_avg = (total_d + differential)/count;
+    ROS_INFO("old_diff: %f  new:diff: %f  diff_avg: %f  r_avg: %f  l_avg: %f  w_avg: %f  N_avg: %f count: %d", differential_old, differential, differential_avg, r_avg, l_avg, w_avg, N_avg, count);
+    differential_old = differential;*/
+}
+
+void Subscriber::changeR(float differential_new){
+    if(differential_old < - 0.0005) {
+        if (differential_new < differential_old) {
+            if(positive)
+                r = r - 0.0001;
+            else
+                r = r + 0.0001;
+            positive = !positive;
+        }
+        else{
+            if(positive)
+                r = r + 0.0001;
+            else
+                r = r - 0.0001;
+        }
+    }
+    else if(differential_old > 0.0005){
+        if (differential_new < differential_old) {
+            if(positive)
+                r = r - 0.0001;
+            else
+                r = r + 0.0001;
+            positive = !positive;
+        }
+        else{
+            if(positive)
+                r = r + 0.0001;
+            else
+                r = r - 0.0001;
+        }
+    }
+}
+
+void Subscriber::changeL(float differential_new){
+    if(differential_old < - 0.0005) {
+        if (differential_new < differential_old) {
+            if(positive)
+                l = l - 0.0001;
+            else
+                l = l + 0.0001;
+            positive = !positive;
+        }
+        else{
+            if(positive)
+                l = l + 0.0001;
+            else
+                l = l - 0.0001;
+        }
+    }
+    else if(differential_old > 0.0005){
+        if (differential_new < differential_old) {
+            if(positive)
+                l = l - 0.0001;
+            else
+                l = l + 0.0001;
+            positive = !positive;
+        }
+        else{
+            if(positive)
+                l = l + 0.0001;
+            else
+                l = l - 0.0001;
+        }
+    }
+}
+
+void Subscriber::changeW(float differential_new){
+    if(differential_old < - 0.0005) {
+        if (differential_new < differential_old) {
+            if(positive)
+                w = w - 0.00001;
+            else
+                w = w + 0.00001;
+            positive = !positive;
+        }
+        else{
+            if(positive)
+                w = w + 0.00001;
+            else
+                w = w - 0.00001;
+        }
+    }
+    else if(differential_old > 0.0005){
+        if (differential_new < differential_old) {
+            if(positive)
+                w = w - 0.00001;
+            else
+                w = w + 0.00001;
+            positive = !positive;
+        }
+        else{
+            if(positive)
+                w = w + 0.00001;
+            else
+                w = w - 0.00001;
+        }
+    }
+}
+
+void Subscriber::changeN(float differential_new){
+    if(differential_old < - 0.0005) {
+        if (differential_new < differential_old) {
+            if(positiveN)
+                if(N > 37)
+                    N = N - 1;
+                else
+                    positiveN = !positiveN;
+            else
+                if( N < 47)
+                    N = N + 1;
+                else
+                    positiveN = !positiveN;
+            positiveN = !positiveN;
+        }
+        else{
+            if(positiveN)
+                if(N < 47)
+                    N = N + 1;
+                else
+                    positiveN = !positiveN;
+            else
+                if(N > 37)
+                    N = N - 1;
+                else
+                    positiveN = !positiveN;
+        }
+    }
+    else if(differential_old > 0.0005){
+        if (differential_new < differential_old) {
+            if(positiveN)
+                if(N > 37)
+                    N = N - 1;
+                else
+                    positiveN = !positiveN;
+            else
+                if(N < 47)
+                    N = N + 1;
+                else
+                    positiveN = !positiveN;
+            positiveN = !positiveN;
+        }
+        else{
+            if(positive)
+                if(N < 47)
+                    N = N + 1;
+                else
+                    positiveN = !positiveN;
+            else
+                if(N > 37)
+                    N = N - 1;
+                else
+                    positiveN = !positiveN;
+        }
     }
 }
 

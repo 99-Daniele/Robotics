@@ -22,16 +22,14 @@ int main(int argc, char **argv) {
    * quanto pare.
    * Per il momento quindi lo utilizziamo solo per il tuning, poi tanto non ci serverà piu e potremo toglierlo.*/
 
-  /*dynamic_reconfigure::Server<callbacks_complete::ApproximationsConfig> server;
+  dynamic_reconfigure::Server<callbacks_complete::ApproximationsConfig> server;
   dynamic_reconfigure::Server<callbacks_complete::ApproximationsConfig>::CallbackType f;
   f = boost::bind(&approximationCallback, _1, &my_subscriber);
-  server.setCallback(f);*/
-  dynamic_reconfigure::Server<callbacks_complete::WheelsConfig> server2;
+  server.setCallback(f);
+  /*dynamic_reconfigure::Server<callbacks_complete::WheelsConfig> server2;
   dynamic_reconfigure::Server<callbacks_complete::WheelsConfig>::CallbackType f2;
   f2 = boost::bind(&wheelCallback, _1, &my_subscriber, _2);
-  server2.setCallback(f2);
-
-  //rosrun rqt_reconfigure rqt_reconfigure (roscore attivo !!) è il comando per aprire l'interfaccia per modificare i parametri
+  server2.setCallback(f2);*/
 
   my_subscriber.main_loop();
 
