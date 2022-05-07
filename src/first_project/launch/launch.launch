@@ -55,7 +55,7 @@
     <!--<node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.00546 0.003997 0.370 -0.0106 -0.0248 -0.0068 1 world odom "/>-->
 
     <arg name="path" default=" $(find first_project)/bags/bag1" />
-    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -l $(arg path).bag">
+    <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg path).bag">
     </node>
 
     <node pkg="first_project" type="sub_wheels" name="my_sub_wheels" output="screen"/>
