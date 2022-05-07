@@ -157,7 +157,7 @@ DA TOGLIERE BAG DAL LAUNCH
 
   In our project we used two nodes:
   - /my_sub_wheels            (??????????BISOGNA AGGIUNGERE CHE ASCOLTA IL SERVICE??????????????)
-    - Subscribe to /wheel_states,
+    - subscribe to /wheel_states,
     - compute and publish:
       - the speed of the wheel (/ticks_to_RPM) from the ticks
       - the velocities of the robot(/cdm_vel) 
