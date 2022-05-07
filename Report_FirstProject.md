@@ -147,6 +147,9 @@ DA TOGLIERE BAG DAL LAUNCH
 
   to start launcher:
   > roslaunch launch.launch
+ 
+  In the launcher we have statistic broadcast with different initial position one for each bag. 
+  Because of that please uncomment the comment with the chosen bag.
 
   In our project we used two nodes:
   - /my_sub_wheels           
