@@ -1,7 +1,5 @@
 # Robotics - first project
 
-DA TOGLIERE BAG DAL LAUNCH
-
 - 10649263 Lorenzo Nebolosi
 - 10630561 Daniele Cicala
 - 10620037 Elena Rosato
