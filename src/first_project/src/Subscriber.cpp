@@ -50,7 +50,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     
     //from ticks TO robot velocity
     float vx;//robot velocity along x
-    float vy;//robot speed along y
+    float vy;//robot velocity along y
     float W;//robot angular velocity
 
     if(start) {
@@ -59,7 +59,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
 
         Ts = (msg->header.stamp - this->old_time).toSec(); // delta time
 
-        //ticks to RPM ci serve per poi confrontarla con gli RPM calcolati in velocity
+        //ticks to RPM (used to check with RPM computed in velocity.cpp)
         first_project::RPM ticks_RPM;
         ticks_RPM.header.stamp = msg->header.stamp;
         ticks_RPM.rpm_fl = ((msg->position[0] - this->old_ticks[0]) * 2 * M_PI) / (N * T * Ts);
