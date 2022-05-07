@@ -33,7 +33,6 @@ void Subscriber::main_loop() {
   n.getParam("/T", this->T);
   n.getParam("/initialApproximation", approximationType);
 
-  setInitialPosition();
 
   ros::Rate loop_rate(10);
 
@@ -192,22 +191,6 @@ bool Subscriber::setServicePosition(first_project::setPos::Request  &req, first_
     return true;
 }
 
-//set initial position based on launcher file parameters
-void Subscriber::setInitialPosition() {
-    float x, y, qx, qy, qz, qw;
-    n.getParam("/x", x);
-    n.getParam("/y", y);
-    n.getParam("/qx", qx);
-    n.getParam("/qy", qy);
-    n.getParam("/qz", qz);
-    n.getParam("/qw", qw);
-
-    tf2::Quaternion q(qx, qy, qz, qw);
-    tf2::Matrix3x3 m(q);
-    double roll, pitch, yaw;
-    m.getRPY(roll, pitch, yaw);
-    setPosition(x, y, (float)yaw);
-}
 
 //change current approximation after dynamic_reconfigure request
 void Subscriber::approximationChange(int approximation){

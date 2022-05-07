@@ -43,7 +43,6 @@ private:
   void velocityPublisher(float vx, float vy, float W, ros::Time stamp);
   void odometryPublisher(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp);
   void odometryBroadcast(float x, float y, float theta, ros::Time stamp);
-  void setInitialPosition();
   void setPosition(float x, float y, float theta);
   bool setServicePosition(first_project::setPos::Request  &req, first_project::setPos::Response &res);
 };
