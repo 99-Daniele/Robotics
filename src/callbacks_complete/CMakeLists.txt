@@ -17,6 +17,11 @@ add_message_files(
         RPM.msg
 )
 
+add_service_files(
+  FILES
+  setPos.srv
+)
+
 generate_messages(
         DEPENDENCIES
         std_msgs

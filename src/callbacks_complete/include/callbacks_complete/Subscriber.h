@@ -11,6 +11,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <callbacks_complete/ApproximationsConfig.h>
 #include <callbacks_complete/WheelsConfig.h>
+#include "callbacks_complete/setPos.h"
 
 class Subscriber {
 public:
@@ -26,6 +27,7 @@ public:
   void approximationCallback(int approximation);
   void wheelParametersCallback(float r, float l, float w, int N, int level);
   void setPosition(float x, float y, float theta);
+  bool setServicePosition(callbacks_complete::setPos::Request  &req, callbacks_complete::setPos::Response &res);
   void changeR(float differential_new);
   void changeL(float differential_new);
   void changeW(float differential_new);
@@ -41,6 +43,7 @@ private:
   ros::Publisher velocity_publisher;
   ros::Publisher odometry_publisher;
   ros::Publisher tick_vel_pub;
+  ros::ServiceServer service;
 
   tf2_ros::TransformBroadcaster br;
 

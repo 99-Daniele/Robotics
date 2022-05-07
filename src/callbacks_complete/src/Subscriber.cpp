@@ -14,6 +14,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/TransformStamped.h>
 #include "tf2/LinearMath/Matrix3x3.h"
+#include "callbacks_complete/setPos.h"
 
 Subscriber::Subscriber() { // class constructor
   // all initializations here
@@ -22,7 +23,9 @@ Subscriber::Subscriber() { // class constructor
 
   this->velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   this->odometry_publisher = this->n.advertise<nav_msgs::Odometry>("odom", 1000);
-  this->tick_vel_pub=this->n.advertise<callbacks_complete::RPM>("ticks_to_RPM",100);
+  this->tick_vel_pub = this->n.advertise<callbacks_complete::RPM>("ticks_to_RPM",100);
+    this->service = n.advertiseService("setPos", &Subscriber::setServicePosition, this);
+
 //  this->old_ticks; //l'ho inizializzato in subscriber.h ma non son sicura che sia corretto
   this->old_time=ros::Time::now();
 }
@@ -35,13 +38,24 @@ void Subscriber::main_loop() {
   n.getParam("/N", N);
   n.getParam("/T", T);
   n.getParam("/initialApproximation", approximationType);
-
   while (ros::ok()) {
 
     ros::spinOnce();
 
     loop_rate.sleep();
   }
+}
+
+bool Subscriber::setServicePosition(callbacks_complete::setPos::Request  &req, callbacks_complete::setPos::Response &res)
+{
+    setPosition(req.x, req.y, req.theta);
+
+    //this->x_old = req.x;
+    //this->y_old = req.y;
+    //this->theta_old = req.theta;
+    ROS_INFO("Read value: x = %d, y = %d and theta = %d", req.x, req.y, req.theta);
+    ROS_INFO("Updated the robot position to: x = %d, y = %d and theta = %d", this->x_old, this->y_old, this->theta_old);
+    return true;
 }
 
 void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
