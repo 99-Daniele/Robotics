@@ -7,19 +7,58 @@
     <param name="T" value="5"/>
     <param name="initialApproximation" value="0"/>
 
-    <node pkg="first_project" type="sub_wheels" name="my_sub_wheels" output="screen"/>
-    <node pkg="first_project" type="velocity" name="my_velocity" output="screen"/>
+    <!-- Each of the following comments are initial position and orientation of each bags-->
 
-    <!-- Each of the following comments are static TF transform to align the frame "odom" and "world" for each different bag.
-         Please uncomment the fist one for bag1, second one for bag2 or third for bag3 -->
+    <!--BAG1: uncomment following lines to play bag1-->
 
+    <param name="x" value="0.00815962441265583"/>
+    <param name="y" value="0.0030597213190048933"/>
+    <param name="z" value="0.3687083423137665"/>
+    <param name="qx" value="-0.011577633209526539"/>
+    <param name="qy" value="-0.02075166068971157"/>
+    <param name="qz" value="-0.019595127552747726"/>
+    <param name="qw" value="0.9995256066322327"/>
+
+
+    <!--BAG2: uncomment following lines to play bag2-->
+
+    <!--<param name="x" value="0.024221817031502724"/>
+    <param name="y" value="0.003742524655535817"/>
+    <param name="z" value="0.372348427772522"/>
+    <param name="qx" value="0.0338488332927227"/>
+    <param name="qy" value="-0.05557403340935707"/>
+    <param name="qz" value="-0.0028051661793142557"/>
+    <param name="qw" value="0.997876763343811"/>-->
+
+
+    <!--BAG3: uncomment following lines to play bag3-->
+
+    <!--<param name="x" value="0.005460123997181654"/>
+    <param name="y" value="0.03997037187218666"/>
+    <param name="z" value="0.3703613579273224"/>
+    <param name="qx" value="-0.010593205690383911"/>
+    <param name="qy" value="-0.024768192321062088"/>
+    <param name="qz" value="-0.006751589477062225"/>
+    <param name="qw" value="0.9996143579483032"/>-->
+
+
+
+    <!-- Each of the following comments are static TF transform to align the frame "odom" and "world" for each different bag-->
+
+    <!--BAG1: uncomment following line to play bag1-->
     <node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.008160 0.003060 0.368708 -0.038735 0 0 1 world odom "/>
+
+    <!--BAG2: uncomment following lines to play bag2-->
     <!--<node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.02422 0.003743 0.372  0.0338 -0.0556 -0.0028 1 world odom "/>-->
+
+    <!--BAG3: uncomment following lines to play bag3-->
     <!--<node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.00546 0.003997 0.370 -0.0106 -0.0248 -0.0068 1 world odom "/>-->
 
     <arg name="path" default=" $(find first_project)/bags/bag1" />
     <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -l $(arg path).bag">
     </node>
 
+    <node pkg="first_project" type="sub_wheels" name="my_sub_wheels" output="screen"/>
+    <node pkg="first_project" type="velocity" name="my_velocity"/>
 
 </launch>

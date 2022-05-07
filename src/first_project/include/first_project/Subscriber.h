@@ -18,9 +18,7 @@ public:
   Subscriber();
 
   void main_loop();
-  void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
   void wheelCallback(const sensor_msgs::JointState::ConstPtr& msg);
-
   void approximationChange(int approximation);
   void wheelParametersChange(float r, float l, float w, int N, int level);
 
@@ -29,7 +27,6 @@ private:
   ros::NodeHandle n;
 
   ros::Subscriber sub_wheel;
-  ros::Subscriber sub_pose;
 
   ros::Publisher velocity_publisher;
   ros::Publisher odometry_publisher;
@@ -42,7 +39,6 @@ private:
   float r, l, w;
   int N, T;
   int approximationType;
-  bool poseSetted = false;
   float x_old = 0.0, y_old = 0.0, theta_old = 0.0;
   float old_ticks[4]= {0.0,0.0,0.0,0.0};
   ros::Time old_time;
@@ -50,6 +46,7 @@ private:
   void velocityPublisher(float vx, float vy, float W, ros::Time stamp);
   void odometryPublisher(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp);
   void odometryBroadcast(float x, float y, float theta, ros::Time stamp);
+  void setInitialPosition();
   void setPosition(float x, float y, float theta);
   bool setServicePosition(first_project::setPos::Request  &req, first_project::setPos::Response &res);
 };

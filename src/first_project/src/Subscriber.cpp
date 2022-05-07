@@ -17,16 +17,17 @@
 #include "first_project/setPos.h"
 
 Subscriber::Subscriber() {
+  old_time=ros::Time::now();
+
+  setInitialPosition();
+
   sub_wheel = n.subscribe("wheel_states", 1000, &Subscriber::wheelCallback, this);
-  sub_pose = n.subscribe("/robot/pose", 1000, &Subscriber::poseCallback, this);//SERVE QUESTO?
 
   velocity_publisher = n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   odometry_publisher = n.advertise<nav_msgs::Odometry>("odom", 1000);
   tick_vel_publisher = n.advertise<first_project::RPM>("ticks_to_RPM",100);
 
   service = n.advertiseService("setPos", &Subscriber::setServicePosition, this);
-
-  old_time=ros::Time::now();
 }
 
 void Subscriber::main_loop() {
@@ -51,10 +52,6 @@ void Subscriber::main_loop() {
 bool Subscriber::setServicePosition(first_project::setPos::Request  &req, first_project::setPos::Response &res){
 
     setPosition(req.x, req.y, req.theta);
-
-    ROS_INFO("Read value: x = %f, y = %f and theta = %f", req.x, req.y, req.theta);
-    ROS_INFO("Updated the robot position to: x = %f, y = %f and theta = %f", this->x_old, this->y_old, this->theta_old);
-
     return true;
 }
 
@@ -209,18 +206,20 @@ void Subscriber::odometryBroadcast(float x, float y, float theta, ros::Time stam
     this->br.sendTransform(odometry_tf);
 }
 
-void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) { //da prendere val nel launch
-    if(!poseSetted){
-        tf2::Quaternion q(msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w);
-        tf2::Matrix3x3 m(q);
-        double roll, pitch, yaw;
-        m.getRPY(roll, pitch, yaw);
-        setPosition(msg->pose.position.x, msg->pose.position.y, (float)yaw);
+void Subscriber::setInitialPosition() {
+    float x, y, qx, qy, qz, qw;
+    n.getParam("/x", x);
+    n.getParam("/y", y);
+    n.getParam("/qx", qx);
+    n.getParam("/qy", qy);
+    n.getParam("/qz", qz);
+    n.getParam("/qw", qw);
 
-        ROS_INFO("NEW POSE SETTED");
-        ROS_INFO("My pose_position: %f, %f, %f, %f, %f, %f", msg->pose.position.x, msg->pose.position.y, msg->pose.position.z, yaw, pitch, roll);
-        poseSetted = true;
-    }
+    tf2::Quaternion q(qx, qy, qz, qw);
+    tf2::Matrix3x3 m(q);
+    double roll, pitch, yaw;
+    m.getRPY(roll, pitch, yaw);
+    setPosition(x, y, (float)yaw);
 }
 
 void Subscriber::approximationChange(int approximation){
@@ -257,4 +256,6 @@ void Subscriber::setPosition(float x, float y, float theta){
     this->x_old = x;
     this->y_old = y;
     this->theta_old = theta;
+    ROS_INFO("NEW POSE SETTED");
+    ROS_INFO("My pose_position: x = %f, y = %f, theta = %f", x_old, y_old, theta_old);
 }
