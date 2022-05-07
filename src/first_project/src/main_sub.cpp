@@ -18,9 +18,9 @@ int main(int argc, char **argv) {
   
   Subscriber my_subscriber;
 
-  /* Momentaneamente il primo dynamic_reconfigure è commentato siccome non se ne possono fare due contemporaneamente a
-   * quanto pare.
-   * Per il momento quindi lo utilizziamo solo per il tuning, poi tanto non ci serverà piu e potremo toglierlo.*/
+  /* This following lines are for create a dynamic_reconfigure server for calibration of wheel parameters
+   *
+   * */
 
   dynamic_reconfigure::Server<first_project::ApproximationsConfig> server;
   dynamic_reconfigure::Server<first_project::ApproximationsConfig>::CallbackType f;

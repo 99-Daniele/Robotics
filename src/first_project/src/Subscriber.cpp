@@ -33,7 +33,6 @@ void Subscriber::main_loop() {
   n.getParam("/T", this->T);
   n.getParam("/initialApproximation", approximationType);
 
-
   ros::Rate loop_rate(10);
 
   while (ros::ok()) {
@@ -52,6 +51,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     float vy;//robot velocity along y
     float W;//robot angular velocity
 
+    //the first iteration only saves initial time and ticks of the bag.
     if(start) {
 
         float Ts;
@@ -190,7 +190,6 @@ bool Subscriber::setServicePosition(first_project::setPos::Request  &req, first_
     setPosition(req.x, req.y, req.theta);
     return true;
 }
-
 
 //change current approximation after dynamic_reconfigure request
 void Subscriber::approximationChange(int approximation){

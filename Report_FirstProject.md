@@ -30,7 +30,7 @@ DA TOGLIERE BAG DAL LAUNCH
         
           RPM = (current_ticks - past_ticks) * 2 * pi / (N * T * deltaTime) 
             
-        and than saved the current ticks as the past ones (old_ticks) to be used in the next iteration. 
+        and then saved the current ticks as the past ones (old_ticks) to be used in the next iteration. 
         
         Then it computes the robot speed:
               
@@ -50,11 +50,11 @@ DA TOGLIERE BAG DAL LAUNCH
           x = x_old + vx * Ts * cos(theta_old + (W * Ts / 2)) - vy * Ts * sin(theta_old + (W * Ts / 2));
           y = y_old + vx * Ts * sin(theta_old + (W * Ts / 2)) + vy * Ts * cos(theta_old + (W * Ts / 2));
           theta = this->theta_old + W * Ts;
-    
+         Actually the first iteration skip all calculation formulas but only saves initial time and ticks taken from the bag.
          We call *odometryPublisher* and *odometryBroadcast*, functions than respectively publish the odometry (in "odom") and broadcast it.
          At the end the current bag time and space parameters are saved to be used in the next callback as the old ones.
-         !!!!!!!!!!DA DESCRIVERE:
-         ODOMETRY AND TF!!!
+         In both odometryPublisher and odometryBroadcast we transform from theta angle to quaternion with tf2 transformations 
+         and in odometryBroadcast we use dynamic reconfigure to broadcast on odom_link.
     - *setServicePosition*
             
        set new current position based on request. Receives three parameters for x, y and theta of new position. 
@@ -67,7 +67,7 @@ DA TOGLIERE BAG DAL LAUNCH
     
       change current approximation from Euler to Runge-Kutta and viceversa after dynamic_reconfigure request.
        
-    - *wheelParamtersChange*
+    - *wheelParametersChange*
       
       change wheel parameters after dynamic_reconfigure request.
         
@@ -110,7 +110,7 @@ DA TOGLIERE BAG DAL LAUNCH
 
   - **"SubPub.h"** 
 
-    It's the definition of a class we create to be hable to have nodes that simultaneusly subscribe and publish data from/to different topics of different types. To do so we created a template which takes the type of the subscribed message and type of the published message.
+    It's the definition of a class we create to be able to have nodes that simultaneously subscribe and publish data from/to different topics of different types. To do so we created a template which takes the type of the subscribed message and type of the published message.
 
   - **Subscriber.h** 
 
@@ -125,23 +125,16 @@ DA TOGLIERE BAG DAL LAUNCH
   - *N*: encoders resolution. Different from the one given because of calibration.
   - *T*: gear ration
   - *initialApproximation*: default value for approximation. In this case is 0 which refers to Euler approximation.
-  - *x*: initial x position of robot. Directly taken from each bags.
-  - *y*: initial y position of robot. Directly taken from each bags.
-  - *z*: initial z position of robot. Directly taken from each bags.
-  - *qx*: initial x orientation of robot. Directly taken from each bags.
-  - *qy*: initial y orientation of robot. Directly taken from each bags.
-  - *qz*: initial z orientation of robot. Directly taken from each bags.
-  - *qw*: initial w orientation of robot. Directly taken from each bags.
 
 
 - ***RQT_GRAPH STRUCTURES***
 
-  mettere png
+  ![alt text](rqt_graph.png)
 
   
 - ***TF TREE STRUCTURES:***
 
-  mettere png
+  ![alt text](frames.png)
 
 
 - ***CUSTOM MESSAGES:***
@@ -156,12 +149,13 @@ DA TOGLIERE BAG DAL LAUNCH
   > roslaunch launch.launch
 
   In our project we used two nodes:
-  - /my_sub_wheels            (??????????BISOGNA AGGIUNGERE CHE ASCOLTA IL SERVICE??????????????)
+  - /my_sub_wheels           
     - subscribe to /wheel_states,
     - compute and publish:
       - the speed of the wheel (/ticks_to_RPM) from the ticks
       - the velocities of the robot(/cdm_vel) 
       - the odometry(/odom)
+    - listen on /setPos service to set new position
   - /my_velocity
     Subscribe to /cdm_vel, compute and publish the speed of the wheel (/wheels_rpm) from /cdm_vel
 
@@ -175,7 +169,7 @@ DA TOGLIERE BAG DAL LAUNCH
 
 - ***RESULT CHECKING***
 
-  We checked with plotjuggler that it was all matching. In particoular we checked that the results matched the recorded encoders values.
+  We checked with plotjuggler that it was all matching. In particular, we checked that the results matched the recorded encoders values.
   For this scope we create a new topic /ticks_to_RPM
-  (INSERIAMO L'IMMAGINE??)
+  ![alt text](plotjuggler.png)
 
