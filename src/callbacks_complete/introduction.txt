@@ -1,3 +1,7 @@
+DA CAMBIARE NOME CALLBACKS COMPLETE.
+ DA TOGLIERE BAG DAL LAUNCH
+parametri da launch
+
 Lorenzo Nebolosi
 Daniele Cicala
 
@@ -10,19 +14,25 @@ Description of the files inside the archive:
 
 -"RPM.msg" the custom message (as shown in the professor slide)
 
--"main_sub.cpp" used for the dynamic reconfigure ----!!NON NE SONO SICURA!!!!
+-"main_sub.cpp" used for the dynamic reconfigure ----!!NON NE SONO SICURA!!!!(o da spostare?)
 
--"Subscriber.cpp" implements the node sub_wheel. It reads the ticks from wheel_states computes the RPM and publish it in the topic ticks_to_RPM(we used to check if our computation was correct). We used the formula: RPM=(current_ticks-past_ticks)*2*pi/(N*T*deltaTime) and than saved the current ticks as the past ones.
+-"Subscriber.cpp" implements the node sub_wheel.
+wheelCallbacks reads the ticks from wheel_states computes the RPM and publish it in the topic ticks_to_RPM(we used to check if our computation was correct).
+We used the formula: RPM=(current_ticks-past_ticks)*2*pi/(N*T*deltaTime)
+and than saved the current ticks as the past ones.
 Then it computes the robot speed:
 Vx=(v_fl+v_fr+v_rl+v_rr)*r/4
 Vy=(-v_fl+v_fr+v_rl-v_rr)*r/4
 W=(-v_fl+v_fr-v_rl+v_rr)*r/(4*(l+w))
 And use the function velocityPublisher to pubblish them in the topic cdm_vel.
-Nex step is the integration, the method is choosen by dynamic reconfigure(by default is Euler method?????????????). We call odometryPublisher and odometryBroadcast, functions than respectively pubblish the odometry(in "odom") and broadcast it. At the end current bag time and space paramethers are saved to be used in the next callback as the old ones.
+Nex step is the integration, the method is choosen via dynamic reconfigure(by default is Euler method).
+We call odometryPublisher and odometryBroadcast, functions than respectively pubblish the odometry(in "odom") and broadcast it.
+At the end current bag time and space paramethers are saved to be used in the next callback as the old ones.
 DA DESCRIVERE:
 ODOMETRY AND TF!!!
-setpose!!
+setpose!! setServicePosition
 change parameters!!!
+approxCallback
 
 
 -"velocity.cpp" it's of the class sub_pub, used to reed cdm_vel, compute the wheel spees and publish it in wheels_rpm as a custom message RPM.
@@ -31,26 +41,37 @@ w_fl=(vx-vy-(l+w)*wz)/r;
 w_fr=(vx+vy+(l+w)*wz)/r;
 w_rl=(vx+vy-(l+w)*wz)/r;
 w_rr=(vx-vy+(l+w)*wz)/r;
+We chacked with plotjuggler che corrispondesse il tutto.....
 
--"CMakeList.txt" (VA SPIEGATO???)
+-"CMakeList.txt"
 
 
 -"ApproximationParameters.cfg" !!!!!!!!!!!!
 
 -"WheelParameters.cfg"!!!!!!!!!!!!!!!
 
--"RPM.h"!!!!!!!!!!!!!!
 
--"SubPub.h"
 
--"Subscriber.h"
+
+-"SubPub.h" ->spiego template!!! e il resto PER nodo CHE FACCIA DA SUB E DA PUB
+
+-"Subscriber.h" It's a class that contains all the needed parameters
+spiego a cosa servono gli old!!!!!
 -"setPos.srv"
 
 
-
-
-- name and meaning of the ROS parameters
+- name and meaning of the ROS parameters //DA FARE
 - structure of the TF tree
-- structure of any custom message
+
+- structure of any custom message  
+As custom message we only used RPM, as requested in the slide
+
 - description of how to start/use the nodes
+
 - info you think are important/interesting
+
+We calibrated the parameters with dynamic reconfigure, starting from bag one. We begun with r and N. Than we focused on the other bag to adjust the other paramethers.
+
+
+
+

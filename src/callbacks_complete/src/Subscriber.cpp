@@ -24,9 +24,8 @@ Subscriber::Subscriber() { // class constructor
   this->velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   this->odometry_publisher = this->n.advertise<nav_msgs::Odometry>("odom", 1000);
   this->tick_vel_pub = this->n.advertise<callbacks_complete::RPM>("ticks_to_RPM",100);
-    this->service = n.advertiseService("setPos", &Subscriber::setServicePosition, this);
+  this->service = n.advertiseService("setPos", &Subscriber::setServicePosition, this);
 
-//  this->old_ticks; //l'ho inizializzato in subscriber.h ma non son sicura che sia corretto
   this->old_time=ros::Time::now();
 }
 
@@ -208,7 +207,7 @@ void Subscriber::odometryBroadcast(float x, float y, float theta, ros::Time stam
     br.sendTransform(odometry_tf);
 }
 
-void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
+void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) { //da prendere val nel launch
     if(!poseSetted){
         tf2::Quaternion q(msg->pose.orientation.x, msg->pose.orientation.y, msg->pose.orientation.z, msg->pose.orientation.w);
         tf2::Matrix3x3 m(q);
