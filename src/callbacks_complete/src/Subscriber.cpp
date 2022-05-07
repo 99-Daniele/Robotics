@@ -18,7 +18,7 @@
 Subscriber::Subscriber() { // class constructor
   // all initializations here
   this->sub_wheel = this->n.subscribe("wheel_states", 1000, &Subscriber::wheelCallback, this);
-  this->sub_pose = this->n.subscribe("/robot/pose", 1000, &Subscriber::poseCallback, this);
+  this->sub_pose = this->n.subscribe("/robot/pose", 1000, &Subscriber::poseCallback, this);//SERVE QUESTO?
 
   this->velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   this->odometry_publisher = this->n.advertise<nav_msgs::Odometry>("odom", 1000);
@@ -51,19 +51,21 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     float vy;//robot speed along y
     float W;//robot angular velocity
 
-    float numVx;//sono step intermedi perchè una volta diviso per il tempo potrebbe dare problemi se i tempi sono infinitesimali
-    float numVy;
-    float numW;
 
     //ticks to RPM ci serve per poi confrontarla con gli RPM calcolati in velocity
     callbacks_complete::RPM ticks_RPM;
     ticks_RPM.header.stamp = msg->header.stamp;
-    ticks_RPM.rpm_fl=((msg->position[0] - this->old_ticks[0])*2*M_PI)/(N * T * (msg->header.stamp - this->old_time).toSec());////////
+    ticks_RPM.rpm_fl=((msg->position[0] - this->old_ticks[0])*2*M_PI)/(N * T * (msg->header.stamp - this->old_time).toSec());
     ticks_RPM.rpm_fr=((msg->position[1] - this->old_ticks[1])*2*M_PI)/(N * T *(msg->header.stamp - this->old_time).toSec());
     ticks_RPM.rpm_rl=((msg->position[2] - this->old_ticks[2])*2*M_PI)/(N * T *(msg->header.stamp - this->old_time).toSec());
     ticks_RPM.rpm_rr=((msg->position[3] - this->old_ticks[3])*2*M_PI)/(N * T *(msg->header.stamp - this->old_time).toSec());
 
     this->tick_vel_pub.publish(ticks_RPM);
+
+   /* //calcolo lungo TUTTO QUESTO CREDO CHE SI POSSA TOGLIERE
+    float numVx;//sono step intermedi perchè una volta diviso per il tempo potrebbe dare problemi se i tempi sono infinitesimali
+    float numVy;
+    float numW;
 
     numVx = ((msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) + (msg->position[2] - this->old_ticks[2]) + (msg->position[3] - this->old_ticks[3]));
     numVy = (-(msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) + (msg->position[2] - this->old_ticks[2]) - (msg->position[3] - this->old_ticks[3]));
@@ -75,18 +77,17 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     vx = (numVx*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
     vy = (numVy*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
     W = (numW*r*M_PI) / (N * 2 * T * (l + w) * (msg->header.stamp - this->old_time).toSec());
+*/
 
+//from RPM to robot velocity
+    vx=(ticks_RPM.rpm_fl+ticks_RPM.rpm_fr+ticks_RPM.rpm_rl+ticks_RPM.rpm_rr)*r/4;
+    vy=(-ticks_RPM.rpm_fl+ticks_RPM.rpm_fr+ticks_RPM.rpm_rl-ticks_RPM.rpm_rr)*r/4;
+    W=(-ticks_RPM.rpm_fl+ticks_RPM.rpm_fr-ticks_RPM.rpm_rl+ticks_RPM.rpm_rr)*r/(4*(l+w));
 
-///accorcio le formule!!!!!!
 
     for (int i = 0; i < msg->position.size(); i++){
         this->old_ticks[i]=msg->position[i];
-    }
-    //codice per pubblicare v e w. considero vx = vx, vy = vy, vz = 0; wx = 0, wy = 0, wz = W (non sono sicura che l'angular sia solo wz, ma direi di si)
-
-    //l'ho commentato perchè faCCIO L'ADVERTISE UNA VOLTA SOLA, altrimenti mi spesso non vedevo il topic
-
-    // ros::Publisher velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
+    };
 
     velocityPublisher(vx, vy, W, msg->header.stamp);
 
