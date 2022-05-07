@@ -77,7 +77,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
 
         this->tick_vel_publisher.publish(ticks_RPM);
 
-        /* //calcolo lungo TUTTO QUESTO CREDO CHE SI POSSA TOGLIERE
+         //calcolo lungo TUTTO QUESTO CREDO CHE SI POSSA TOGLIERE
          float numVx;//sono step intermedi perchè una volta diviso per il tempo potrebbe dare problemi se i tempi sono infinitesimali
          float numVy;
          float numW;
@@ -222,8 +222,6 @@ void Subscriber::setInitialPosition() {
     double roll, pitch, yaw;
     m.getRPY(roll, pitch, yaw);
     setPosition(x, y, (float)yaw);
-
-    sub_wheel = n.subscribe("wheel_states", 1000, &Subscriber::wheelCallback, this);
 }
 
 void Subscriber::approximationChange(int approximation){
