@@ -24,13 +24,14 @@ DA TOGLIERE BAG DAL LAUNCH
     implements the node sub_wheel, which have different functions: 
     - *wheelCallbacks* 
       
-      reads the ticks from wheel_states and computes the RPM and publish it in the topic *ticks_to_RPM* (we used it to check if our computation was correct). 
+      reads the ticks from wheel_states and computes the RPM and publish it in the topic *ticks_to_RPM* as the same custom message of wheels_rpm (we used it to check if our computation was correct). 
   
-        We used the formula:
+        For each wheel we used the formula:
         
           RPM = (current_ticks - past_ticks) * 2 * pi / (N * T * deltaTime) 
             
-        and than saved the current ticks as the past ones. 
+        and than saved the current ticks as the past ones (old_ticks) to be used in the next iteration. 
+        
         Then it computes the robot speed:
               
           Vx = (v_fl + v_fr + v_rl + v_rr) * r/4
@@ -39,9 +40,20 @@ DA TOGLIERE BAG DAL LAUNCH
   
         and use the function *velocityPublisher* to publish them in the topic cdm_vel.
         Next step is the integration, the method is chosen via dynamic reconfigure (by default is Euler method).
-        We call *odometryPublisher* and *odometryBroadcast*, functions than respectively publish the odometry (in "odom") and broadcast it.
-        At the end the current bag time and space parameters are saved to be used in the next callback as the old ones.
-         DA DESCRIVERE:
+        
+            //Euler method
+          x = x_old + vx * Ts * cos(theta_old) - vy * Ts * sin(theta_old);
+          y = y_old + vx * Ts * sin(theta_old) + vy * Ts * cos(theta_old);
+          theta = this->theta_old + W * Ts;
+    
+            //Runge Kutta
+          x = x_old + vx * Ts * cos(theta_old + (W * Ts / 2)) - vy * Ts * sin(theta_old + (W * Ts / 2));
+          y = y_old + vx * Ts * sin(theta_old + (W * Ts / 2)) + vy * Ts * cos(theta_old + (W * Ts / 2));
+          theta = this->theta_old + W * Ts;
+    
+         We call *odometryPublisher* and *odometryBroadcast*, functions than respectively publish the odometry (in "odom") and broadcast it.
+         At the end the current bag time and space parameters are saved to be used in the next callback as the old ones.
+         !!!!!!!!!!DA DESCRIVERE:
          ODOMETRY AND TF!!!
     - *setServicePosition*
             
@@ -92,7 +104,7 @@ DA TOGLIERE BAG DAL LAUNCH
 
   - **setPos.srv**
 
-    this is the requested service which set to chosen position.
+    this is the requested service which set to chosen position, given as x, y and theta (in radiants).
     To call service:
     > rosservice call /setPos 0 0 0
 
@@ -102,8 +114,9 @@ DA TOGLIERE BAG DAL LAUNCH
 
   - **Subscriber.h** 
 
-    It's a class that contains all the needed parameters
-    spiego a cosa servono gli old!!!!!
+    It's a class that contains all the needed parameters.
+    
+    !!!!!!!!!!!!!!spiego a cosa servono gli old!!!!!(servono ancora?????? in realtà mi sa che lo dicevo già prima)
 
 
 - ***ROS PARAMETERS:***
@@ -135,6 +148,7 @@ DA TOGLIERE BAG DAL LAUNCH
 - ***CUSTOM MESSAGES:***
 
   Our unique custom message is RPM.msg which is the one requested.
+  We used it both for wheels_rpm and for ticks_to_RPM
 
 
 - ***ROS NODES:***
@@ -153,6 +167,7 @@ DA TOGLIERE BAG DAL LAUNCH
   We mainly used rviz and plotjuggler to confront our odometry with the given one on robot/pose.
 
 - ***RESULT CHECKING***
+
   We checked with plotjuggler that it was all matching. In particoular we checked that the results matched the recorded encoders values.
   For this scope we create a new topic /ticks_to_RPM
   (INSERIAMO L'IMMAGINE??)

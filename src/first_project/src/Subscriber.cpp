@@ -84,13 +84,13 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
             //Euler method
             x = this->x_old + vx * Ts * cos(this->theta_old) - vy * Ts * sin(this->theta_old);
             y = this->y_old + vx * Ts * sin(this->theta_old) + vy * Ts * cos(this->theta_old);
-            theta = this->theta_old + W * Ts;
         } else {
             //Runge Kutta
             x = this->x_old + vx * Ts * cos(this->theta_old + (W * Ts / 2)) - vy * Ts * sin(this->theta_old + (W * Ts / 2));
             y = this->y_old + vx * Ts * sin(this->theta_old + (W * Ts / 2)) + vy * Ts * cos(this->theta_old + (W * Ts / 2));
-            theta = this->theta_old + W * Ts;
         }
+        theta = this->theta_old + W * Ts;
+
 
         odometryPublisher(x, vx, y, vy, theta, W, msg->header.stamp);
         odometryBroadcast(x, y, theta, msg->header.stamp);
