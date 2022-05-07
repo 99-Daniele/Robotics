@@ -1,15 +1,15 @@
 #include "ros/ros.h"
-#include "callbacks_complete/Subscriber.h"
+#include "first_project/Subscriber.h"
 
 #include <dynamic_reconfigure/server.h>
-#include <callbacks_complete/ApproximationsConfig.h>
-#include <callbacks_complete/WheelsConfig.h>
+#include <first_project/ApproximationsConfig.h>
+#include <first_project/WheelsConfig.h>
 
-void approximationCallback(callbacks_complete::ApproximationsConfig &config, Subscriber* sub) {
+void approximationCallback(first_project::ApproximationsConfig &config, Subscriber* sub) {
     sub->approximationCallback(config.approximation);
 }
 
-void wheelCallback(callbacks_complete::WheelsConfig &config, Subscriber* sub, uint32_t level){
+void wheelCallback(first_project::WheelsConfig &config, Subscriber* sub, uint32_t level){
     sub->wheelParametersCallback(config.r, config.l, config.w, config.N, level);
 }
 
@@ -22,12 +22,12 @@ int main(int argc, char **argv) {
    * quanto pare.
    * Per il momento quindi lo utilizziamo solo per il tuning, poi tanto non ci serverà piu e potremo toglierlo.*/
 
-  dynamic_reconfigure::Server<callbacks_complete::ApproximationsConfig> server;
-  dynamic_reconfigure::Server<callbacks_complete::ApproximationsConfig>::CallbackType f;
+  dynamic_reconfigure::Server<first_project::ApproximationsConfig> server;
+  dynamic_reconfigure::Server<first_project::ApproximationsConfig>::CallbackType f;
   f = boost::bind(&approximationCallback, _1, &my_subscriber);
   server.setCallback(f);
-  /*dynamic_reconfigure::Server<callbacks_complete::WheelsConfig> server2;
-  dynamic_reconfigure::Server<callbacks_complete::WheelsConfig>::CallbackType f2;
+  /*dynamic_reconfigure::Server<first_project::WheelsConfig> server2;
+  dynamic_reconfigure::Server<first_project::WheelsConfig>::CallbackType f2;
   f2 = boost::bind(&wheelCallback, _1, &my_subscriber, _2);
   server2.setCallback(f2);*/
 

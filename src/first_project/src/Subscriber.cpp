@@ -2,8 +2,8 @@
  
 #include <cmath>
 #include <iostream>
-#include "callbacks_complete/Subscriber.h"
-#include "callbacks_complete/RPM.h"
+#include "first_project/Subscriber.h"
+#include "first_project/RPM.h"
 
 #include "ros/ros.h"
 #include "geometry_msgs/PoseStamped.h"
@@ -14,7 +14,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 #include <geometry_msgs/TransformStamped.h>
 #include "tf2/LinearMath/Matrix3x3.h"
-#include "callbacks_complete/setPos.h"
+#include "first_project/setPos.h"
 
 Subscriber::Subscriber() { // class constructor
   // all initializations here
@@ -23,7 +23,7 @@ Subscriber::Subscriber() { // class constructor
 
   this->velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
   this->odometry_publisher = this->n.advertise<nav_msgs::Odometry>("odom", 1000);
-  this->tick_vel_pub = this->n.advertise<callbacks_complete::RPM>("ticks_to_RPM",100);
+  this->tick_vel_pub = this->n.advertise<first_project::RPM>("ticks_to_RPM",100);
   this->service = n.advertiseService("setPos", &Subscriber::setServicePosition, this);
 
   this->old_time=ros::Time::now();
@@ -45,7 +45,7 @@ void Subscriber::main_loop() {
   }
 }
 
-bool Subscriber::setServicePosition(callbacks_complete::setPos::Request  &req, callbacks_complete::setPos::Response &res)
+bool Subscriber::setServicePosition(first_project::setPos::Request  &req, first_project::setPos::Response &res)
 {
     setPosition(req.x, req.y, req.theta);
 
@@ -68,7 +68,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     Ts = (msg->header.stamp - this->old_time).toSec(); // delta time
 
     //ticks to RPM ci serve per poi confrontarla con gli RPM calcolati in velocity
-    callbacks_complete::RPM ticks_RPM;
+    first_project::RPM ticks_RPM;
     ticks_RPM.header.stamp = msg->header.stamp;
     ticks_RPM.rpm_fl=((msg->position[0] - this->old_ticks[0])*2*M_PI)/(N * T * Ts);
     ticks_RPM.rpm_fr=((msg->position[1] - this->old_ticks[1])*2*M_PI)/(N * T *Ts);

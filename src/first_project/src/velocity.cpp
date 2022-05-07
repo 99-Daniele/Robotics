@@ -1,11 +1,11 @@
 #include "ros/ros.h"
 #include "geometry_msgs/TwistStamped.h"
-#include "callbacks_complete/Subscriber.h"
-#include "callbacks_complete/RPM.h"
-#include "callbacks_complete/SubPub.h"
+#include "first_project/Subscriber.h"
+#include "first_project/RPM.h"
+#include "first_project/SubPub.h"
 
 template<>
-void SubPub<geometry_msgs::TwistStamped,callbacks_complete::RPM>::subscriberCallback(const geometry_msgs::TwistStamped::ConstPtr& msg) {
+void SubPub<geometry_msgs::TwistStamped,first_project::RPM>::subscriberCallback(const geometry_msgs::TwistStamped::ConstPtr& msg) {
 
     float vx = msg->twist.linear.x;
     float vy = msg->twist.linear.y;
@@ -23,7 +23,7 @@ void SubPub<geometry_msgs::TwistStamped,callbacks_complete::RPM>::subscriberCall
     n.getParam("/l", l);
     n.getParam("/w", w);
 
-    callbacks_complete::RPM wheel_speed;
+    first_project::RPM wheel_speed;
 
     wheel_speed.header.stamp = msg->header.stamp;
 
@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
 
     ros::init(argc, argv, "velocity");
 
-    SubPub<geometry_msgs::TwistStamped,callbacks_complete::RPM>velocity("cmd_vel","wheels_rpm",1000);
+    SubPub<geometry_msgs::TwistStamped,first_project::RPM>velocity("cmd_vel","wheels_rpm",1000);
 
     ros::spin();
 

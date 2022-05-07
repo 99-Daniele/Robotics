@@ -7,8 +7,8 @@
     <param name="T" value="5"/>
     <param name="initialApproximation" value="0"/>
 
-    <node pkg="callbacks_complete" type="sub_wheels" name="my_sub_wheels" output="screen"/>
-    <node pkg="callbacks_complete" type="velocity" name="my_velocity" output="screen"/>
+    <node pkg="first_project" type="sub_wheels" name="my_sub_wheels" output="screen"/>
+    <node pkg="first_project" type="velocity" name="my_velocity" output="screen"/>
 
     <!-- Each of the following comments are static TF transform to align the frame "odom" and "world" for each different bag.
          Please uncomment the fist one for bag1, second one for bag2 or third for bag3 -->
@@ -17,7 +17,7 @@
     <!--<node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.02422 0.003743 0.372  0.0338 -0.0556 -0.0028 1 world odom "/>-->
     <!--<node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.00546 0.003997 0.370 -0.0106 -0.0248 -0.0068 1 world odom "/>-->
 
-    <arg name="path" default=" $(find callbacks_complete)/bags/bag1" />
+    <arg name="path" default=" $(find first_project)/bags/bag1" />
     <node pkg="rosbag" type="play" name="player" output="screen" args="--clock -l $(arg path).bag">
     </node>
 
