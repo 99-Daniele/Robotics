@@ -1,0 +1,56 @@
+Lorenzo Nebolosi
+Daniele Cicala
+
+10620037 Elena Rosato
+
+Description of the files inside the archive:
+
+-'launch.launch' is the launch file. It starts all the nodes and the initial pose for the odometry
+?---anche i parametri---?
+
+-"RPM.msg" the custom message (as shown in the professor slide)
+
+-"main_sub.cpp" used for the dynamic reconfigure ----!!NON NE SONO SICURA!!!!
+
+-"Subscriber.cpp" implements the node sub_wheel. It reads the ticks from wheel_states computes the RPM and publish it in the topic ticks_to_RPM(we used to check if our computation was correct). We used the formula: RPM=(current_ticks-past_ticks)*2*pi/(N*T*deltaTime) and than saved the current ticks as the past ones.
+Then it computes the robot speed:
+Vx=(v_fl+v_fr+v_rl+v_rr)*r/4
+Vy=(-v_fl+v_fr+v_rl-v_rr)*r/4
+W=(-v_fl+v_fr-v_rl+v_rr)*r/(4*(l+w))
+And use the function velocityPublisher to pubblish them in the topic cdm_vel.
+Nex step is the integration, the method is choosen by dynamic reconfigure(by default is Euler method?????????????). We call odometryPublisher and odometryBroadcast, functions than respectively pubblish the odometry(in "odom") and broadcast it. At the end current bag time and space paramethers are saved to be used in the next callback as the old ones.
+DA DESCRIVERE:
+ODOMETRY AND TF!!!
+setpose!!
+change parameters!!!
+
+
+-"velocity.cpp" it's of the class sub_pub, used to reed cdm_vel, compute the wheel spees and publish it in wheels_rpm as a custom message RPM.
+we used the formulas:
+w_fl=(vx-vy-(l+w)*wz)/r;
+w_fr=(vx+vy+(l+w)*wz)/r;
+w_rl=(vx+vy-(l+w)*wz)/r;
+w_rr=(vx-vy+(l+w)*wz)/r;
+
+-"CMakeList.txt" (VA SPIEGATO???)
+
+
+-"ApproximationParameters.cfg" !!!!!!!!!!!!
+
+-"WheelParameters.cfg"!!!!!!!!!!!!!!!
+
+-"RPM.h"!!!!!!!!!!!!!!
+
+-"SubPub.h"
+
+-"Subscriber.h"
+-"setPos.srv"
+
+
+
+
+- name and meaning of the ROS parameters
+- structure of the TF tree
+- structure of any custom message
+- description of how to start/use the nodes
+- info you think are important/interesting
