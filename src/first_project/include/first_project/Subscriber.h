@@ -39,6 +39,7 @@ private:
   float r, l, w;
   int N, T;
   int approximationType;
+  bool start = false;
   float x_old = 0.0, y_old = 0.0, theta_old = 0.0;
   float old_ticks[4]= {0.0,0.0,0.0,0.0};
   ros::Time old_time;

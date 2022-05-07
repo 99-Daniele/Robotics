@@ -17,9 +17,6 @@
 #include "first_project/setPos.h"
 
 Subscriber::Subscriber() {
-  old_time=ros::Time::now();
-
-  setInitialPosition();
 
   sub_wheel = n.subscribe("wheel_states", 1000, &Subscriber::wheelCallback, this);
 
@@ -39,6 +36,8 @@ void Subscriber::main_loop() {
   n.getParam("/T", this->T);
   n.getParam("/initialApproximation", approximationType);
 
+  setInitialPosition();
+
   ros::Rate loop_rate(10);
 
   while (ros::ok()) {
@@ -50,7 +49,6 @@ void Subscriber::main_loop() {
 }
 
 bool Subscriber::setServicePosition(first_project::setPos::Request  &req, first_project::setPos::Response &res){
-
     setPosition(req.x, req.y, req.theta);
     return true;
 }
@@ -62,74 +60,78 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     float vy;//robot speed along y
     float W;//robot angular velocity
 
-    float Ts;
+    if(start) {
 
-    Ts = (msg->header.stamp - this->old_time).toSec(); // delta time
+        float Ts;
 
-    //ticks to RPM ci serve per poi confrontarla con gli RPM calcolati in velocity
-    first_project::RPM ticks_RPM;
-    ticks_RPM.header.stamp = msg->header.stamp;
-    ticks_RPM.rpm_fl=((msg->position[0] - this->old_ticks[0])*2*M_PI)/(N * T * Ts);
-    ticks_RPM.rpm_fr=((msg->position[1] - this->old_ticks[1])*2*M_PI)/(N * T *Ts);
-    ticks_RPM.rpm_rl=((msg->position[2] - this->old_ticks[2])*2*M_PI)/(N * T *Ts);
-    ticks_RPM.rpm_rr=((msg->position[3] - this->old_ticks[3])*2*M_PI)/(N * T *Ts);
+        Ts = (msg->header.stamp - this->old_time).toSec(); // delta time
 
-    this->tick_vel_publisher.publish(ticks_RPM);
+        //ticks to RPM ci serve per poi confrontarla con gli RPM calcolati in velocity
+        first_project::RPM ticks_RPM;
+        ticks_RPM.header.stamp = msg->header.stamp;
+        ticks_RPM.rpm_fl = ((msg->position[0] - this->old_ticks[0]) * 2 * M_PI) / (N * T * Ts);
+        ticks_RPM.rpm_fr = ((msg->position[1] - this->old_ticks[1]) * 2 * M_PI) / (N * T * Ts);
+        ticks_RPM.rpm_rl = ((msg->position[2] - this->old_ticks[2]) * 2 * M_PI) / (N * T * Ts);
+        ticks_RPM.rpm_rr = ((msg->position[3] - this->old_ticks[3]) * 2 * M_PI) / (N * T * Ts);
+        ROS_INFO("fl:%f, fr:%f, rl:%f, rr:%f, N:%d, T:%d, Ts:%f", ticks_RPM.rpm_fl, ticks_RPM.rpm_fr, ticks_RPM.rpm_rl, ticks_RPM.rpm_rr, N, T, Ts);
 
-   /* //calcolo lungo TUTTO QUESTO CREDO CHE SI POSSA TOGLIERE
-    float numVx;//sono step intermedi perchè una volta diviso per il tempo potrebbe dare problemi se i tempi sono infinitesimali
-    float numVy;
-    float numW;
+        this->tick_vel_publisher.publish(ticks_RPM);
 
-    numVx = ((msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) + (msg->position[2] - this->old_ticks[2]) + (msg->position[3] - this->old_ticks[3]));
-    numVy = (-(msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) + (msg->position[2] - this->old_ticks[2]) - (msg->position[3] - this->old_ticks[3]));
-    numW = (-(msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) - (msg->position[2] - this->old_ticks[2]) + (msg->position[3] - this->old_ticks[3]));
+        /* //calcolo lungo TUTTO QUESTO CREDO CHE SI POSSA TOGLIERE
+         float numVx;//sono step intermedi perchè una volta diviso per il tempo potrebbe dare problemi se i tempi sono infinitesimali
+         float numVy;
+         float numW;
 
-    //ROS_INFO("Duration seconds: %d, and nanoseconds: %d", msg->header.stamp.sec, msg->header.stamp.nsec);
-    //ROS_INFO("Duration in seconds: %lf", msg->header.stamp.toSec());
-        //vx=numVx*2*pi/((time-past_time)*N(=42)*T(=5))*r/4
-    vx = (numVx*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
-    vy = (numVy*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
-    W = (numW*r*M_PI) / (N * 2 * T * (l + w) * (msg->header.stamp - this->old_time).toSec());
-*/
+         numVx = ((msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) + (msg->position[2] - this->old_ticks[2]) + (msg->position[3] - this->old_ticks[3]));
+         numVy = (-(msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) + (msg->position[2] - this->old_ticks[2]) - (msg->position[3] - this->old_ticks[3]));
+         numW = (-(msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) - (msg->position[2] - this->old_ticks[2]) + (msg->position[3] - this->old_ticks[3]));
 
-    //from RPM to robot velocity
-    vx=(ticks_RPM.rpm_fl+ticks_RPM.rpm_fr+ticks_RPM.rpm_rl+ticks_RPM.rpm_rr)*r/4;
-    vy=(-ticks_RPM.rpm_fl+ticks_RPM.rpm_fr+ticks_RPM.rpm_rl-ticks_RPM.rpm_rr)*r/4;
-    W=(-ticks_RPM.rpm_fl+ticks_RPM.rpm_fr-ticks_RPM.rpm_rl+ticks_RPM.rpm_rr)*r/(4*(l+w));
+         //ROS_INFO("Duration seconds: %d, and nanoseconds: %d", msg->header.stamp.sec, msg->header.stamp.nsec);
+         //ROS_INFO("Duration in seconds: %lf", msg->header.stamp.toSec());
+             //vx=numVx*2*pi/((time-past_time)*N(=42)*T(=5))*r/4
+         vx = (numVx*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
+         vy = (numVy*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
+         W = (numW*r*M_PI) / (N * 2 * T * (l + w) * (msg->header.stamp - this->old_time).toSec());
+     */
 
-    //save old ticks
-    for (int i = 0; i < msg->position.size(); i++){
-        this->old_ticks[i]=msg->position[i];
-    };
+        //from RPM to robot velocity
+        vx = (ticks_RPM.rpm_fl + ticks_RPM.rpm_fr + ticks_RPM.rpm_rl + ticks_RPM.rpm_rr) * r / 4;
+        vy = (-ticks_RPM.rpm_fl + ticks_RPM.rpm_fr + ticks_RPM.rpm_rl - ticks_RPM.rpm_rr) * r / 4;
+        W = (-ticks_RPM.rpm_fl + ticks_RPM.rpm_fr - ticks_RPM.rpm_rl + ticks_RPM.rpm_rr) * r / (4 * (l + w));
 
-    velocityPublisher(vx, vy, W, msg->header.stamp);
 
-    //integration of vx, vy and W to find the pose (x,y,theta)
+        velocityPublisher(vx, vy, W, msg->header.stamp);
 
-    float x,y,theta;
+        //integration of vx, vy and W to find the pose (x,y,theta)
 
-    if(this->approximationType == 0) {
-        //Euler method
-        x = this->x_old + vx * Ts * cos(this->theta_old) - vy * Ts * sin(this->theta_old);
-        y = this->y_old + vx * Ts * sin(this->theta_old) + vy * Ts * cos(this->theta_old);
-        theta = this->theta_old + W * Ts;
+        float x, y, theta;
+        if (this->approximationType == 0) {
+            //Euler method
+            x = this->x_old + vx * Ts * cos(this->theta_old) - vy * Ts * sin(this->theta_old);
+            y = this->y_old + vx * Ts * sin(this->theta_old) + vy * Ts * cos(this->theta_old);
+            theta = this->theta_old + W * Ts;
+        } else {
+            //Runge Kutta
+            x = this->x_old + vx * Ts * cos(this->theta_old + (W * Ts / 2)) - vy * Ts * sin(this->theta_old + (W * Ts / 2));
+            y = this->y_old + vx * Ts * sin(this->theta_old + (W * Ts / 2)) + vy * Ts * cos(this->theta_old + (W * Ts / 2));
+            theta = this->theta_old + W * Ts;
+        }
+
+        odometryPublisher(x, vx, y, vy, theta, W, msg->header.stamp);
+        odometryBroadcast(x, y, theta, msg->header.stamp);
+
+        this->x_old = x;
+        this->y_old = y;
+        this->theta_old = theta;
     }
-    else {
-        //Runge Kutta
-        x = this->x_old + vx * Ts * cos(this->theta_old + (W * Ts / 2)) - vy * Ts * sin(this->theta_old + (W * Ts / 2));
-        y = this->y_old + vx * Ts * sin(this->theta_old + (W * Ts / 2)) + vy * Ts * cos(this->theta_old + (W * Ts / 2));
-        theta = this->theta_old + W * Ts;
-    }
-
-    odometryPublisher(x, vx, y, vy, theta, W, msg->header.stamp);
-    odometryBroadcast(x, y, theta, msg->header.stamp);
+    start = true;
 
     //save x, y, theta and time for next integration
     this->old_time=msg->header.stamp;
-    this->x_old = x;
-    this->y_old = y;
-    this->theta_old = theta;
+    //save old ticks
+    for (int i = 0; i < msg->position.size(); i++) {
+        this->old_ticks[i] = msg->position[i];
+    };
 
     ros::spinOnce();
 }
@@ -220,6 +222,8 @@ void Subscriber::setInitialPosition() {
     double roll, pitch, yaw;
     m.getRPY(roll, pitch, yaw);
     setPosition(x, y, (float)yaw);
+
+    sub_wheel = n.subscribe("wheel_states", 1000, &Subscriber::wheelCallback, this);
 }
 
 void Subscriber::approximationChange(int approximation){
