@@ -1,7 +1,6 @@
 #ifndef SUBSCRIBER_H
 #define SUBSCRIBER_H
 
-
 #include "ros/ros.h"
 #include "std_msgs/Int32.h"
 #include "geometry_msgs/PoseStamped.h"
@@ -21,17 +20,9 @@ public:
   void main_loop();
   void poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg);
   void wheelCallback(const sensor_msgs::JointState::ConstPtr& msg);
-  void velocityPublisher(float vx, float vy, float W, ros::Time stamp);
-  void odometryPublisher(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp);
-  void odometryBroadcast(float x, float y, float theta, ros::Time stamp);
-  void approximationCallback(int approximation);
-  void wheelParametersCallback(float r, float l, float w, int N, int level);
-  void setPosition(float x, float y, float theta);
-  bool setServicePosition(first_project::setPos::Request  &req, first_project::setPos::Response &res);
-  void changeR(float differential_new);
-  void changeL(float differential_new);
-  void changeW(float differential_new);
-  void changeN(float differential_new);
+
+  void approximationChange(int approximation);
+  void wheelParametersChange(float r, float l, float w, int N, int level);
 
 private:
 
@@ -42,29 +33,25 @@ private:
 
   ros::Publisher velocity_publisher;
   ros::Publisher odometry_publisher;
-  ros::Publisher tick_vel_pub;
+  ros::Publisher tick_vel_publisher;
+
   ros::ServiceServer service;
 
   tf2_ros::TransformBroadcaster br;
 
-  float r;
-  float r_avg = 0.07;
-  float l;
-  float l_avg = 0.2;
-  float w;
-  float w_avg = 0.169;
-  int N;
-  float N_avg = 42.0;
-  int count = 0;
-  int T;
+  float r, l, w;
+  int N, T;
   int approximationType;
   bool poseSetted = false;
   float x_old = 0.0, y_old = 0.0, theta_old = 0.0;
-  float differential_old = 0.0;
-  float differential_avg = 0.0;
-  bool positive = true, positiveN = true;
   float old_ticks[4]= {0.0,0.0,0.0,0.0};
   ros::Time old_time;
+
+  void velocityPublisher(float vx, float vy, float W, ros::Time stamp);
+  void odometryPublisher(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp);
+  void odometryBroadcast(float x, float y, float theta, ros::Time stamp);
+  void setPosition(float x, float y, float theta);
+  bool setServicePosition(first_project::setPos::Request  &req, first_project::setPos::Response &res);
 };
 
 #endif

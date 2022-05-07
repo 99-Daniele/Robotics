@@ -16,44 +16,45 @@
 #include "tf2/LinearMath/Matrix3x3.h"
 #include "first_project/setPos.h"
 
-Subscriber::Subscriber() { // class constructor
-  // all initializations here
-  this->sub_wheel = this->n.subscribe("wheel_states", 1000, &Subscriber::wheelCallback, this);
-  this->sub_pose = this->n.subscribe("/robot/pose", 1000, &Subscriber::poseCallback, this);//SERVE QUESTO?
+Subscriber::Subscriber() {
+  sub_wheel = n.subscribe("wheel_states", 1000, &Subscriber::wheelCallback, this);
+  sub_pose = n.subscribe("/robot/pose", 1000, &Subscriber::poseCallback, this);//SERVE QUESTO?
 
-  this->velocity_publisher = this->n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
-  this->odometry_publisher = this->n.advertise<nav_msgs::Odometry>("odom", 1000);
-  this->tick_vel_pub = this->n.advertise<first_project::RPM>("ticks_to_RPM",100);
-  this->service = n.advertiseService("setPos", &Subscriber::setServicePosition, this);
+  velocity_publisher = n.advertise<geometry_msgs::TwistStamped>("cmd_vel", 1000);
+  odometry_publisher = n.advertise<nav_msgs::Odometry>("odom", 1000);
+  tick_vel_publisher = n.advertise<first_project::RPM>("ticks_to_RPM",100);
 
-  this->old_time=ros::Time::now();
+  service = n.advertiseService("setPos", &Subscriber::setServicePosition, this);
+
+  old_time=ros::Time::now();
 }
 
 void Subscriber::main_loop() {
-  ros::Rate loop_rate(10);
-  n.getParam("/r", r);
-  n.getParam("/l", l);
-  n.getParam("/w", w);
-  n.getParam("/N", N);
-  n.getParam("/T", T);
+
+  n.getParam("/r", this->r);
+  n.getParam("/l", this->l);
+  n.getParam("/w", this->w);
+  n.getParam("/N", this->N);
+  n.getParam("/T", this->T);
   n.getParam("/initialApproximation", approximationType);
+
+  ros::Rate loop_rate(10);
+
   while (ros::ok()) {
 
     ros::spinOnce();
-
     loop_rate.sleep();
+
   }
 }
 
-bool Subscriber::setServicePosition(first_project::setPos::Request  &req, first_project::setPos::Response &res)
-{
+bool Subscriber::setServicePosition(first_project::setPos::Request  &req, first_project::setPos::Response &res){
+
     setPosition(req.x, req.y, req.theta);
 
-    //this->x_old = req.x;
-    //this->y_old = req.y;
-    //this->theta_old = req.theta;
     ROS_INFO("Read value: x = %f, y = %f and theta = %f", req.x, req.y, req.theta);
     ROS_INFO("Updated the robot position to: x = %f, y = %f and theta = %f", this->x_old, this->y_old, this->theta_old);
+
     return true;
 }
 
@@ -65,6 +66,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     float W;//robot angular velocity
 
     float Ts;
+
     Ts = (msg->header.stamp - this->old_time).toSec(); // delta time
 
     //ticks to RPM ci serve per poi confrontarla con gli RPM calcolati in velocity
@@ -75,7 +77,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     ticks_RPM.rpm_rl=((msg->position[2] - this->old_ticks[2])*2*M_PI)/(N * T *Ts);
     ticks_RPM.rpm_rr=((msg->position[3] - this->old_ticks[3])*2*M_PI)/(N * T *Ts);
 
-    this->tick_vel_pub.publish(ticks_RPM);
+    this->tick_vel_publisher.publish(ticks_RPM);
 
    /* //calcolo lungo TUTTO QUESTO CREDO CHE SI POSSA TOGLIERE
     float numVx;//sono step intermedi perchè una volta diviso per il tempo potrebbe dare problemi se i tempi sono infinitesimali
@@ -94,20 +96,19 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     W = (numW*r*M_PI) / (N * 2 * T * (l + w) * (msg->header.stamp - this->old_time).toSec());
 */
 
-//from RPM to robot velocity
+    //from RPM to robot velocity
     vx=(ticks_RPM.rpm_fl+ticks_RPM.rpm_fr+ticks_RPM.rpm_rl+ticks_RPM.rpm_rr)*r/4;
     vy=(-ticks_RPM.rpm_fl+ticks_RPM.rpm_fr+ticks_RPM.rpm_rl-ticks_RPM.rpm_rr)*r/4;
     W=(-ticks_RPM.rpm_fl+ticks_RPM.rpm_fr-ticks_RPM.rpm_rl+ticks_RPM.rpm_rr)*r/(4*(l+w));
 
-
+    //save old ticks
     for (int i = 0; i < msg->position.size(); i++){
         this->old_ticks[i]=msg->position[i];
     };
 
     velocityPublisher(vx, vy, W, msg->header.stamp);
 
-
-    //**INTEGRATION OF vx, vy and W to find the pose (x,y,theta)
+    //integration of vx, vy and W to find the pose (x,y,theta)
 
     float x,y,theta;
 
@@ -127,6 +128,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     odometryPublisher(x, vx, y, vy, theta, W, msg->header.stamp);
     odometryBroadcast(x, y, theta, msg->header.stamp);
 
+    //save x, y, theta and time for next integration
     this->old_time=msg->header.stamp;
     this->x_old = x;
     this->y_old = y;
@@ -204,7 +206,7 @@ void Subscriber::odometryBroadcast(float x, float y, float theta, ros::Time stam
     odometry_tf.transform.rotation.z = q.z();
     odometry_tf.transform.rotation.w = q.w();
 
-    br.sendTransform(odometry_tf);
+    this->br.sendTransform(odometry_tf);
 }
 
 void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) { //da prendere val nel launch
@@ -213,193 +215,15 @@ void Subscriber::poseCallback(const geometry_msgs::PoseStamped::ConstPtr& msg) {
         tf2::Matrix3x3 m(q);
         double roll, pitch, yaw;
         m.getRPY(roll, pitch, yaw);
-        this->setPosition(msg->pose.position.x, msg->pose.position.y, (float)yaw);
+        setPosition(msg->pose.position.x, msg->pose.position.y, (float)yaw);
 
-        ROS_INFO("POSE SETTED");
+        ROS_INFO("NEW POSE SETTED");
         ROS_INFO("My pose_position: %f, %f, %f, %f, %f, %f", msg->pose.position.x, msg->pose.position.y, msg->pose.position.z, yaw, pitch, roll);
         poseSetted = true;
     }
-    /*float pose_x = msg->pose.position.x;
-    float odom_x = x_old;
-    float pose_y = msg->pose.position.y;
-    float odom_y = y_old;
-    float differential = (odom_x - pose_x) * (odom_y - pose_y);
-    changeR(differential);
-    changeL(differential);
-    changeW(differential);
-    changeN(differential);
-    float total_r = r_avg * count;
-    float total_l = l_avg * count;
-    float total_w = w_avg * count;
-    float total_N = N_avg * count;
-    float total_d = differential_avg * count;
-    count++;
-    r_avg = (total_r + r)/count;
-    l_avg = (total_l + l)/count;
-    w_avg = (total_w + w)/count;
-    N_avg = (total_N + N)/count;
-    differential_avg = (total_d + differential)/count;
-    ROS_INFO("old_diff: %f  new:diff: %f  diff_avg: %f  r_avg: %f  l_avg: %f  w_avg: %f  N_avg: %f count: %d", differential_old, differential, differential_avg, r_avg, l_avg, w_avg, N_avg, count);
-    differential_old = differential;*/
 }
 
-void Subscriber::changeR(float differential_new){
-    if(differential_old < - 0.0005) {
-        if (differential_new < differential_old) {
-            if(positive)
-                r = r - 0.0001;
-            else
-                r = r + 0.0001;
-            positive = !positive;
-        }
-        else{
-            if(positive)
-                r = r + 0.0001;
-            else
-                r = r - 0.0001;
-        }
-    }
-    else if(differential_old > 0.0005){
-        if (differential_new < differential_old) {
-            if(positive)
-                r = r - 0.0001;
-            else
-                r = r + 0.0001;
-            positive = !positive;
-        }
-        else{
-            if(positive)
-                r = r + 0.0001;
-            else
-                r = r - 0.0001;
-        }
-    }
-}
-
-void Subscriber::changeL(float differential_new){
-    if(differential_old < - 0.0005) {
-        if (differential_new < differential_old) {
-            if(positive)
-                l = l - 0.0001;
-            else
-                l = l + 0.0001;
-            positive = !positive;
-        }
-        else{
-            if(positive)
-                l = l + 0.0001;
-            else
-                l = l - 0.0001;
-        }
-    }
-    else if(differential_old > 0.0005){
-        if (differential_new < differential_old) {
-            if(positive)
-                l = l - 0.0001;
-            else
-                l = l + 0.0001;
-            positive = !positive;
-        }
-        else{
-            if(positive)
-                l = l + 0.0001;
-            else
-                l = l - 0.0001;
-        }
-    }
-}
-
-void Subscriber::changeW(float differential_new){
-    if(differential_old < - 0.0005) {
-        if (differential_new < differential_old) {
-            if(positive)
-                w = w - 0.00001;
-            else
-                w = w + 0.00001;
-            positive = !positive;
-        }
-        else{
-            if(positive)
-                w = w + 0.00001;
-            else
-                w = w - 0.00001;
-        }
-    }
-    else if(differential_old > 0.0005){
-        if (differential_new < differential_old) {
-            if(positive)
-                w = w - 0.00001;
-            else
-                w = w + 0.00001;
-            positive = !positive;
-        }
-        else{
-            if(positive)
-                w = w + 0.00001;
-            else
-                w = w - 0.00001;
-        }
-    }
-}
-
-void Subscriber::changeN(float differential_new){
-    if(differential_old < - 0.0005) {
-        if (differential_new < differential_old) {
-            if(positiveN)
-                if(N > 37)
-                    N = N - 1;
-                else
-                    positiveN = !positiveN;
-            else
-                if( N < 47)
-                    N = N + 1;
-                else
-                    positiveN = !positiveN;
-            positiveN = !positiveN;
-        }
-        else{
-            if(positiveN)
-                if(N < 47)
-                    N = N + 1;
-                else
-                    positiveN = !positiveN;
-            else
-                if(N > 37)
-                    N = N - 1;
-                else
-                    positiveN = !positiveN;
-        }
-    }
-    else if(differential_old > 0.0005){
-        if (differential_new < differential_old) {
-            if(positiveN)
-                if(N > 37)
-                    N = N - 1;
-                else
-                    positiveN = !positiveN;
-            else
-                if(N < 47)
-                    N = N + 1;
-                else
-                    positiveN = !positiveN;
-            positiveN = !positiveN;
-        }
-        else{
-            if(positive)
-                if(N < 47)
-                    N = N + 1;
-                else
-                    positiveN = !positiveN;
-            else
-                if(N > 37)
-                    N = N - 1;
-                else
-                    positiveN = !positiveN;
-        }
-    }
-}
-
-void Subscriber::approximationCallback(int approximation){
+void Subscriber::approximationChange(int approximation){
     if(approximation == 0)
         ROS_INFO("Approximation changed: EULER");
     else
@@ -407,7 +231,7 @@ void Subscriber::approximationCallback(int approximation){
     this->approximationType = approximation;
 }
 
-void Subscriber::wheelParametersCallback(float r, float l, float w, int N, int level){
+void Subscriber::wheelParametersChange(float r, float l, float w, int N, int level){
     switch(level){
         case 0:
             this->r = r;

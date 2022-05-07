@@ -6,11 +6,11 @@
 #include <first_project/WheelsConfig.h>
 
 void approximationCallback(first_project::ApproximationsConfig &config, Subscriber* sub) {
-    sub->approximationCallback(config.approximation);
+    sub->approximationChange(config.approximation);
 }
 
 void wheelCallback(first_project::WheelsConfig &config, Subscriber* sub, uint32_t level){
-    sub->wheelParametersCallback(config.r, config.l, config.w, config.N, level);
+    sub->wheelParametersChange(config.r, config.l, config.w, config.N, level);
 }
 
 int main(int argc, char **argv) {
