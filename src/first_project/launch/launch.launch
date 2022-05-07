@@ -1,8 +1,8 @@
 <launch>
 
     <param name="r" value="0.075"/>
-    <param name="l" value="0.19"/>
-    <param name="w" value="0.169"/>
+    <param name="l" value="0.195"/>
+    <param name="w" value="0.167"/>
     <param name="N" value="41"/>
     <param name="T" value="5"/>
     <param name="initialApproximation" value="0"/>
@@ -10,15 +10,15 @@
     <!-- Each of the following comments are static TF transform to align the frame "odom" and "world" for each different bag-->
 
     <!--BAG1: uncomment following line to play bag1-->
-    <!--<node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.008160 0.003060 0.368708 0 0 0 1 world odom "/>-->
+    <node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.008160 0.003060 0.368708 0 0 0 1 world odom "/>
 
     <!--BAG2: uncomment following lines to play bag2-->
-    <node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.024222 0.003743 0.372348  0.0338 0 0 1 world odom "/>
+    <!--<node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.024222 0.003743 0.372348  0 0 0 1 world odom "/>-->
 
     <!--BAG3: uncomment following lines to play bag3-->
-    <!--<node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.005460 0.003997 0.370361 -0.0106 0 9 1 world odom "/>-->
+    <!--<node pkg="tf2_ros" type="static_transform_publisher" name="world_odom" args="0.005460 0.039970 0.370361 0 0 0 1 world odom "/>-->
 
-    <arg name="path" default=" $(find first_project)/bags/bag2" />
+    <arg name="path" default=" $(find first_project)/bags/bag3" />
     <node pkg="rosbag" type="play" name="player" output="screen" args="--clock $(arg path).bag">
     </node>
 
