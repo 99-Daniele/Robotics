@@ -2,14 +2,10 @@
 #define SUBSCRIBER_H
 
 #include "ros/ros.h"
-#include "std_msgs/Int32.h"
 #include "geometry_msgs/PoseStamped.h"
 #include "sensor_msgs/JointState.h"
 #include "nav_msgs/Odometry.h"
 #include <tf2_ros/transform_broadcaster.h>
-#include <dynamic_reconfigure/server.h>
-#include <first_project/ApproximationsConfig.h>
-#include <first_project/WheelsConfig.h>
 #include "first_project/setPos.h"
 
 class Subscriber {

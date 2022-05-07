@@ -11,10 +11,7 @@
 #include "sensor_msgs/JointState.h"
 #include "nav_msgs/Odometry.h"
 #include <tf2/LinearMath/Quaternion.h>
-#include <tf2_ros/transform_broadcaster.h>
-#include <geometry_msgs/TransformStamped.h>
 #include "tf2/LinearMath/Matrix3x3.h"
-#include "first_project/setPos.h"
 
 Subscriber::Subscriber() {
 
@@ -48,11 +45,7 @@ void Subscriber::main_loop() {
   }
 }
 
-bool Subscriber::setServicePosition(first_project::setPos::Request  &req, first_project::setPos::Response &res){
-    setPosition(req.x, req.y, req.theta);
-    return true;
-}
-
+//subscriber of /wheel_states topic
 void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     
     //FROM TICKS TO robot velocity
@@ -73,7 +66,6 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
         ticks_RPM.rpm_fr = ((msg->position[1] - this->old_ticks[1]) * 2 * M_PI) / (N * T * Ts);
         ticks_RPM.rpm_rl = ((msg->position[2] - this->old_ticks[2]) * 2 * M_PI) / (N * T * Ts);
         ticks_RPM.rpm_rr = ((msg->position[3] - this->old_ticks[3]) * 2 * M_PI) / (N * T * Ts);
-        ROS_INFO("fl:%f, fr:%f, rl:%f, rr:%f, N:%d, T:%d, Ts:%f", ticks_RPM.rpm_fl, ticks_RPM.rpm_fr, ticks_RPM.rpm_rl, ticks_RPM.rpm_rr, N, T, Ts);
 
         this->tick_vel_publisher.publish(ticks_RPM);
 
@@ -135,6 +127,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     ros::spinOnce();
 }
 
+//publish robot velocity on /cmd_vel topic
 void Subscriber::velocityPublisher(float vx, float vy, float W, ros::Time stamp){
 
     geometry_msgs::TwistStamped velocity_msg;
@@ -152,6 +145,7 @@ void Subscriber::velocityPublisher(float vx, float vy, float W, ros::Time stamp)
     this->velocity_publisher.publish(velocity_msg);
 }
 
+//publish robot odometry on /odom topic
 void Subscriber::odometryPublisher(float x, float vx, float y, float vy, float theta, float W, ros::Time stamp){
 
     nav_msgs::Odometry odometry_msg;
@@ -185,6 +179,7 @@ void Subscriber::odometryPublisher(float x, float vx, float y, float vy, float t
     this->odometry_publisher.publish(odometry_msg);
 }
 
+//broadcast TF on odom --> base_link
 void Subscriber::odometryBroadcast(float x, float y, float theta, ros::Time stamp){
 
     geometry_msgs::TransformStamped odometry_tf;
@@ -207,6 +202,13 @@ void Subscriber::odometryBroadcast(float x, float y, float theta, ros::Time stam
     this->br.sendTransform(odometry_tf);
 }
 
+//set new current position after service request
+bool Subscriber::setServicePosition(first_project::setPos::Request  &req, first_project::setPos::Response &res){
+    setPosition(req.x, req.y, req.theta);
+    return true;
+}
+
+//set initial position based on launcher file parameters
 void Subscriber::setInitialPosition() {
     float x, y, qx, qy, qz, qw;
     n.getParam("/x", x);
@@ -223,6 +225,7 @@ void Subscriber::setInitialPosition() {
     setPosition(x, y, (float)yaw);
 }
 
+//change current approximation after dynamic_reconfigure request
 void Subscriber::approximationChange(int approximation){
     if(approximation == 0)
         ROS_INFO("Approximation changed: EULER");
@@ -231,6 +234,7 @@ void Subscriber::approximationChange(int approximation){
     this->approximationType = approximation;
 }
 
+//change wheel parameters after dynamic_reconfigure request
 void Subscriber::wheelParametersChange(float r, float l, float w, int N, int level){
     switch(level){
         case 0:
@@ -253,6 +257,7 @@ void Subscriber::wheelParametersChange(float r, float l, float w, int N, int lev
     ROS_INFO("r: %f, l: %f, w: %f, N: %d", this->r, this->l, this->w, this->N);
 }
 
+//set current robot position
 void Subscriber::setPosition(float x, float y, float theta){
     this->x_old = x;
     this->y_old = y;
