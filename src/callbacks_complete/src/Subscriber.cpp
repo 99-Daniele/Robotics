@@ -53,8 +53,8 @@ bool Subscriber::setServicePosition(callbacks_complete::setPos::Request  &req, c
     //this->x_old = req.x;
     //this->y_old = req.y;
     //this->theta_old = req.theta;
-    ROS_INFO("Read value: x = %d, y = %d and theta = %d", req.x, req.y, req.theta);
-    ROS_INFO("Updated the robot position to: x = %d, y = %d and theta = %d", this->x_old, this->y_old, this->theta_old);
+    ROS_INFO("Read value: x = %f, y = %f and theta = %f", req.x, req.y, req.theta);
+    ROS_INFO("Updated the robot position to: x = %f, y = %f and theta = %f", this->x_old, this->y_old, this->theta_old);
     return true;
 }
 
