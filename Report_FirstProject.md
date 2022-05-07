@@ -116,7 +116,6 @@ DA TOGLIERE BAG DAL LAUNCH
 
     It's a class that contains all the needed parameters.
     
-    !!!!!!!!!!!!!!spiego a cosa servono gli old!!!!!(servono ancora?????? in realtà mi sa che lo dicevo già prima)
 
 
 - ***ROS PARAMETERS:***
@@ -156,7 +155,15 @@ DA TOGLIERE BAG DAL LAUNCH
   to start launcher:
   > roslaunch launch.launch
 
-  spiegare nodi
+  In our project we used two nodes:
+  - /my_sub_wheels            (??????????BISOGNA AGGIUNGERE CHE ASCOLTA IL SERVICE??????????????)
+    - Subscribe to /wheel_states,
+    - compute and publish:
+      - the speed of the wheel (/ticks_to_RPM) from the ticks
+      - the velocities of the robot(/cdm_vel) 
+      - the odometry(/odom)
+  - /my_velocity
+    Subscribe to /cdm_vel, compute and publish the speed of the wheel (/wheels_rpm) from /cdm_vel
 
 
 - ***CALIBRATION:*** 
