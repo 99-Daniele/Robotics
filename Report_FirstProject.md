@@ -148,5 +148,8 @@ DA TOGLIERE BAG DAL LAUNCH
   After that, we moved to bag2 and bag3 to calibrate l and w to obtain the better approximation of given position.
   We mainly used rviz and plotjuggler to confront our odometry with the given one on robot/pose.
 
+- ***RESULT CHECKING***
+
+  ticks topic aggiunto da noi...
 
 

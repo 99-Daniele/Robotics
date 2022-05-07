@@ -48,7 +48,7 @@ void Subscriber::main_loop() {
 //subscriber of /wheel_states topic
 void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     
-    //FROM TICKS TO robot velocity
+    //from ticks TO robot velocity
     float vx;//robot velocity along x
     float vy;//robot speed along y
     float W;//robot angular velocity
