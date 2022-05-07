@@ -65,14 +65,16 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
     float vy;//robot speed along y
     float W;//robot angular velocity
 
+    float Ts;
+    Ts = (msg->header.stamp - this->old_time).toSec(); // delta time
 
     //ticks to RPM ci serve per poi confrontarla con gli RPM calcolati in velocity
     callbacks_complete::RPM ticks_RPM;
     ticks_RPM.header.stamp = msg->header.stamp;
-    ticks_RPM.rpm_fl=((msg->position[0] - this->old_ticks[0])*2*M_PI)/(N * T * (msg->header.stamp - this->old_time).toSec());
-    ticks_RPM.rpm_fr=((msg->position[1] - this->old_ticks[1])*2*M_PI)/(N * T *(msg->header.stamp - this->old_time).toSec());
-    ticks_RPM.rpm_rl=((msg->position[2] - this->old_ticks[2])*2*M_PI)/(N * T *(msg->header.stamp - this->old_time).toSec());
-    ticks_RPM.rpm_rr=((msg->position[3] - this->old_ticks[3])*2*M_PI)/(N * T *(msg->header.stamp - this->old_time).toSec());
+    ticks_RPM.rpm_fl=((msg->position[0] - this->old_ticks[0])*2*M_PI)/(N * T * Ts);
+    ticks_RPM.rpm_fr=((msg->position[1] - this->old_ticks[1])*2*M_PI)/(N * T *Ts);
+    ticks_RPM.rpm_rl=((msg->position[2] - this->old_ticks[2])*2*M_PI)/(N * T *Ts);
+    ticks_RPM.rpm_rr=((msg->position[3] - this->old_ticks[3])*2*M_PI)/(N * T *Ts);
 
     this->tick_vel_pub.publish(ticks_RPM);
 
@@ -108,8 +110,7 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
 
     //**INTEGRATION OF vx, vy and W to find the pose (x,y,theta)
 
-    float x,y,theta,Ts;
-    Ts = (msg->header.stamp - this->old_time).toSec();
+    float x,y,theta;
 
     if(this->approximationType == 0) {
         //Euler method
