@@ -76,23 +76,6 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
 
     this->tick_vel_publisher.publish(ticks_RPM);
 
-   /* //calcolo lungo TUTTO QUESTO CREDO CHE SI POSSA TOGLIERE
-    float numVx;//sono step intermedi perchè una volta diviso per il tempo potrebbe dare problemi se i tempi sono infinitesimali
-    float numVy;
-    float numW;
-
-    numVx = ((msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) + (msg->position[2] - this->old_ticks[2]) + (msg->position[3] - this->old_ticks[3]));
-    numVy = (-(msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) + (msg->position[2] - this->old_ticks[2]) - (msg->position[3] - this->old_ticks[3]));
-    numW = (-(msg->position[0] - this->old_ticks[0]) + (msg->position[1] - this->old_ticks[1]) - (msg->position[2] - this->old_ticks[2]) + (msg->position[3] - this->old_ticks[3]));
-
-    //ROS_INFO("Duration seconds: %d, and nanoseconds: %d", msg->header.stamp.sec, msg->header.stamp.nsec);
-    //ROS_INFO("Duration in seconds: %lf", msg->header.stamp.toSec());
-        //vx=numVx*2*pi/((time-past_time)*N(=42)*T(=5))*r/4
-    vx = (numVx*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
-    vy = (numVy*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
-    W = (numW*r*M_PI) / (N * 2 * T * (l + w) * (msg->header.stamp - this->old_time).toSec());
-*/
-
     //from RPM to robot velocity
     vx=(ticks_RPM.rpm_fl+ticks_RPM.rpm_fr+ticks_RPM.rpm_rl+ticks_RPM.rpm_rr)*r/4;
     vy=(-ticks_RPM.rpm_fl+ticks_RPM.rpm_fr+ticks_RPM.rpm_rl-ticks_RPM.rpm_rr)*r/4;
