@@ -92,7 +92,6 @@ void Subscriber::wheelCallback(const sensor_msgs::JointState::ConstPtr& msg) {
          vx = (numVx*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
          vy = (numVy*r*M_PI) / (N * 2 * T * (msg->header.stamp - this->old_time).toSec());
          W = (numW*r*M_PI) / (N * 2 * T * (l + w) * (msg->header.stamp - this->old_time).toSec());
-     */
 
         //from RPM to robot velocity
         vx = (ticks_RPM.rpm_fl + ticks_RPM.rpm_fr + ticks_RPM.rpm_rl + ticks_RPM.rpm_rr) * r / 4;
