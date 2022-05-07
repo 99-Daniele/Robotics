@@ -16,9 +16,12 @@ DA TOGLIERE BAG DAL LAUNCH
 
   - **main_sub.cpp** 
 
-    used for the dynamic reconfigure ----!!NON NE SONO SICURA!!!!(o da spostare?)
+    is the file which start Subscriber.cpp main loop and create a dynamic_reconfigure server to permit the change of parameters.
+    The two callbacks approximationCallback and wheelCallback call Subscriber methods for change parameters.
 
-  - **Subscriber.cpp** implements the node sub_wheel, which have different functions: 
+  - **Subscriber.cpp** 
+  
+    implements the node sub_wheel, which have different functions: 
     - *wheelCallbacks* 
       
       reads the ticks from wheel_states and computes the RPM and publish it in the topic *ticks_to_RPM* (we used it to check if our computation was correct). 
@@ -32,7 +35,7 @@ DA TOGLIERE BAG DAL LAUNCH
               
           Vx = (v_fl + v_fr + v_rl + v_rr) * r/4
           Vy = (-v_fl + v_fr + v_rl - v_rr) * r/4
-          W = (-v_fl + v_fr - v_rl + v_rr) * r/(4 * (l + w))
+          W  = (-v_fl + v_fr - v_rl + v_rr) * r/(4 * (l + w))
   
         and use the function *velocityPublisher* to publish them in the topic cdm_vel.
         Next step is the integration, the method is chosen via dynamic reconfigure (by default is Euler method).
@@ -42,7 +45,7 @@ DA TOGLIERE BAG DAL LAUNCH
          ODOMETRY AND TF!!!
     - *setServicePosition*
             
-       set new current position based on request.
+       set new current position based on request. Receives three parameters for x, y and theta of new position. 
         
     - *setInitialPosition* 
         
@@ -77,24 +80,21 @@ DA TOGLIERE BAG DAL LAUNCH
 
     is a dynamic reconfigure file which change the current approximation from Euler to Runge-Kutta and viceversa
 
-
   - **"WheelParameters.cfg"**
 
     is a dynamic reconfigure file which change wheel parameters. Those are wheel radius, wheel positions along x.
     wheel position along y and CPR. This file was created for calibration of these parameters.
-
 
   - **RPM.msg**
 
     this is the required custom message. Its parameters are one Header and 4 Float referring to wheels velocity
     expressed in RPM.
 
-
   - **setPos.srv**
 
-    mettere descrizione....
-    rosservice call /setPos 0 0 0
-
+    this is the requested service which set to chosen position.
+    To call service:
+    > rosservice call /setPos 0 0 0
 
   - **"SubPub.h"** 
 
@@ -121,9 +121,11 @@ DA TOGLIERE BAG DAL LAUNCH
   - *qz*: initial z orientation of robot. Directly taken from each bags.
   - *qw*: initial w orientation of robot. Directly taken from each bags.
 
+
 - ***RQT_GRAPH STRUCTURES***
 
   mettere png
+
   
 - ***TF TREE STRUCTURES:***
 
@@ -135,9 +137,12 @@ DA TOGLIERE BAG DAL LAUNCH
   Our unique custom message is RPM.msg which is the one requested.
 
 
-- ***START/USE NODES:***
+- ***ROS NODES:***
 
-  roslaunch launch.launch
+  to start launcher:
+  > roslaunch launch.launch
+
+  spiegare nodi
 
 
 - ***CALIBRATION:*** 
