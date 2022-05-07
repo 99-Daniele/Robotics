@@ -71,7 +71,7 @@ DA TOGLIERE BAG DAL LAUNCH
         w_rl=(vx+vy-(l+w)*wz)/r;
         w_rr=(vx-vy+(l+w)*wz)/r;
 
-    We checked with plotjuggler that it was all matching.
+    We checked with plotjuggler that the results matched the recorded encoders values (ticks_to_RPM).
 
   - **"ApproximationParameters.cfg"**
 
@@ -98,8 +98,7 @@ DA TOGLIERE BAG DAL LAUNCH
 
   - **"SubPub.h"** 
 
-    ->spiego template!!! e il resto PER nodo CHE FACCIA DA SUB E DA PUB
-
+    It's the definition of a class we create to be hable to have nodes that simultaneusly subscribe and publish data from/to different topics of different types. To do so we created a template which takes the type of the subscribed message and type of the published message.
 
   - **Subscriber.h** 
 
@@ -149,7 +148,7 @@ DA TOGLIERE BAG DAL LAUNCH
   We mainly used rviz and plotjuggler to confront our odometry with the given one on robot/pose.
 
 - ***RESULT CHECKING***
-
-  ticks topic aggiunto da noi...
-
+  We checked with plotjuggler that it was all matching. In particoular we checked that the results matched the recorded encoders values.
+  For this scope we create a new topic /ticks_to_RPM
+  (INSERIAMO L'IMMAGINE??)
 
