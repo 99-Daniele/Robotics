@@ -18,14 +18,13 @@ int main(int argc, char **argv) {
   
   Subscriber my_subscriber;
 
-  /* This following lines are for create a dynamic_reconfigure server for calibration of wheel parameters
-   *
-   * */
-
   dynamic_reconfigure::Server<first_project::ApproximationsConfig> server;
   dynamic_reconfigure::Server<first_project::ApproximationsConfig>::CallbackType f;
   f = boost::bind(&approximationCallback, _1, &my_subscriber);
   server.setCallback(f);
+
+  // This following lines are for create a dynamic_reconfigure server for calibration of wheel parameters
+
   /*dynamic_reconfigure::Server<first_project::WheelsConfig> server2;
   dynamic_reconfigure::Server<first_project::WheelsConfig>::CallbackType f2;
   f2 = boost::bind(&wheelCallback, _1, &my_subscriber, _2);

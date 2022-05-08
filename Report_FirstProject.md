@@ -171,6 +171,7 @@
 - ***RESULT CHECKING***
 
   We checked with plotjuggler that it was all matching. In particular, we checked that the results matched the recorded encoders values.
-  For this scope we create a new topic /ticks_to_RPM
+  For this scope we transform /wheel_states ticks to RPM, then we publish them on a created topic /ticks_to_RPM and
+  confront with the ones published on topic wheels_rpm. 
   ![alt text](plotjuggler.png)
 
