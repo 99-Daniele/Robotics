@@ -67,3 +67,11 @@ given:
 - Wheel position along y (w): 0.169 m
 - Gear ratio (T): 5:1
 - Encoders resolution (N): 42 CPR (Counts Per Rev.) (could be a bit off)
+
+## Autori
+
+[Daniele Cicala](https://github.com/99-Daniele)
+
+[Lorenzo Nebolosi](https://github.com/lorenzonebolosi)
+
+[Elena Rosato](https://github.com/rosatele)
